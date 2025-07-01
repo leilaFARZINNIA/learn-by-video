@@ -1,35 +1,97 @@
-import { useAppContext } from '@/context/AppContext';
-import { useTheme } from '@react-navigation/native';
-import React from 'react';
-import { StyleSheet, Switch, Text, View } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import {
+  Animated,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
+import { useResponsive } from '../constants/responsive';
+import { useTheme } from '../context/ThemeContext';
 
-export const ToggleThemeButton = () => {
-  const { theme, toggleTheme } = useAppContext();
-  const { colors } = useTheme();
+const ToggleThemeButton = () => {
+  const { isDarkMode, toggleTheme } = useTheme();
+  const { isMobile } = useResponsive();
 
-  const isDark = theme === 'dark';
+  const animation = useRef(new Animated.Value(isDarkMode ? 1 : 0)).current;
+
+  const switchWidth = isMobile ? 48 : 60;
+  const switchHeight = isMobile ? 24 : 30;
+  const thumbSize = isMobile ? 18 : 24;
+  const iconSize = isMobile ? 14 : 18;
+  const padding = 3;
+
+  useEffect(() => {
+    Animated.timing(animation, {
+      toValue: isDarkMode ? 1 : 0,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+  }, [isDarkMode]);
+
+  const thumbPosition = animation.interpolate({
+    inputRange: [0, 1],
+    outputRange: [padding, switchWidth - thumbSize - padding],
+  });
+
+  const switchBackgroundColor = animation.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['#ddd', '#444'],
+  });
+
+  const thumbColor = animation.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['#fff', '#222'],
+  });
 
   return (
-    <View style={styles.container}>
-      <Text style={[styles.label, { color: colors.text }]}>Dark Mode</Text>
-      <Switch
-        value={isDark}
-        onValueChange={toggleTheme}
-        thumbColor={isDark ? '#f5dd4b' : '#fff'}
-        trackColor={{ false: '#ccc', true: '#81b0ff' }}
-      />
-    </View>
+    <TouchableOpacity onPress={toggleTheme}>
+      <Animated.View
+        style={[
+          styles.switchBackground,
+          {
+            width: switchWidth,
+            height: switchHeight,
+            borderRadius: switchHeight,
+            backgroundColor: switchBackgroundColor,
+          },
+        ]}
+      >
+        <Animated.View
+          style={[
+            styles.thumb,
+            {
+              width: thumbSize,
+              height: thumbSize,
+              borderRadius: thumbSize / 2,
+              left: thumbPosition,
+              backgroundColor: thumbColor,
+            },
+          ]}
+        >
+          <Image
+            source={
+              isDarkMode
+                ? require('../assets/images/moon.png')
+                : require('../assets/images/sun.png')
+            }
+            style={{ width: iconSize, height: iconSize, resizeMode: 'contain' }}
+          />
+        </Animated.View>
+      </Animated.View>
+    </TouchableOpacity>
   );
 };
 
+export default ToggleThemeButton;
+
 const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginVertical: 16,
+  switchBackground: {
+    padding: 3,
+    justifyContent: 'center',
   },
-  label: {
-    fontSize: 16,
+  thumb: {
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

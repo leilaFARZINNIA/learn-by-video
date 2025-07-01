@@ -1,20 +1,23 @@
 export const lightColors = {
-  background: '#fefefe',
-  text: '#111',
-  primary: '#0066cc',
-  card: '#fff',
-  border: '#ddd',
-  notification: '#ff453a',
+  background: '#F9FAFB',
+  topSectionBg: '#DFF6F3',
+  middleSectionBg: '#F9FAFB',
+  bottomSectionBg: '#e3f9f4',
+  textPrimary: '#000',
+  textSecondary: '#555',
 };
 
 export const darkColors = {
-  background: '#111',
-  text: '#fefefe',
-  primary: '#3399ff',
-  card: '#1e1e1e',
-  border: '#333',
-  notification: '#ff453a',
+  background: '#202833',
+  topSectionBg: '#2C3E50',
+  middleSectionBg: '#263645',
+  bottomSectionBg: '#2F4459',
+  textPrimary: '#FFFFFF',
+  textSecondary: '#D0D8E0',
+  iconColor: '#FFD700', // optional accent
 };
+
+
 
 export const fonts = {
   regular: { fontFamily: 'System', fontWeight: '400' },
