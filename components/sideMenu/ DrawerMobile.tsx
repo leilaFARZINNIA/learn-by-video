@@ -1,0 +1,83 @@
+import React, { useRef, useState } from 'react';
+import { Animated, TouchableOpacity, View } from 'react-native';
+import { useTheme } from '../../context/ThemeContext';
+import CustomHeader from '../CustomHeaderProps';
+import MenuContent from './MenuContent';
+import styles from './styles';
+
+const SIDEBAR_EXPANDED = 220;
+
+export default function DrawerMobile({ children }: { children: React.ReactNode }) {
+  const [expanded, setExpanded] = useState(false);
+  const [selectedMenu, setSelectedMenu] = useState<number | null>(null);
+  const [selectedHistory, setSelectedHistory] = useState<number | null>(null);
+  const sidebarAnim = useRef(new Animated.Value(-SIDEBAR_EXPANDED)).current;
+  const { colors } = useTheme();
+
+  const openSidebar = () => {
+    Animated.timing(sidebarAnim, {
+      toValue: 0,
+      duration: 260,
+      useNativeDriver: true,
+    }).start();
+    setExpanded(true);
+  };
+
+  const closeSidebar = () => {
+    Animated.timing(sidebarAnim, {
+      toValue: -SIDEBAR_EXPANDED,
+      duration: 220,
+      useNativeDriver: true,
+    }).start(() => setExpanded(false));
+  };
+
+  const toggleSidebar = () => expanded ? closeSidebar() : openSidebar();
+
+  return (
+    <View style={{ flex: 1 }}>
+      <CustomHeader
+        title="Learn by Video"
+        isSidebarOpen={expanded}
+        toggleSidebar={toggleSidebar}
+      />
+      <View style={{ flex: 1 }}>
+        <Animated.View
+          style={[
+            styles.sidebar,
+            {
+              width: SIDEBAR_EXPANDED,
+              transform: [{ translateX: sidebarAnim }],
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              height: '100%',
+              zIndex: 999,
+              backgroundColor: colors.sidebarBg,
+              borderRightColor: colors.sidebarBorder,
+              shadowColor: colors.sidebarShadow,
+            },
+          ]}
+        >
+          <MenuContent
+            expanded={expanded}
+            selectedMenu={selectedMenu}
+            setSelectedMenu={setSelectedMenu}
+            selectedHistory={selectedHistory}
+            setSelectedHistory={setSelectedHistory}
+          />
+        </Animated.View>
+        {expanded && (
+          <TouchableOpacity
+            style={[
+              styles.backdrop,
+              { backgroundColor: colors.backdrop },
+            ]}
+            activeOpacity={1}
+            onPress={closeSidebar}
+          />
+        )}
+        <View style={{ flex: 1 }}>{children}</View>
+      </View>
+    </View>
+  );
+}
