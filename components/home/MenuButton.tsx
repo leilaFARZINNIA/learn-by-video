@@ -1,14 +1,14 @@
 import React, { useRef } from 'react';
 import {
   Animated,
-  Image,
   StyleSheet,
   Text,
   TouchableWithoutFeedback,
+  View,
 } from 'react-native';
 
 interface Props {
-  icon: any;
+  icon: React.ReactNode;   
   label: string;
   iconSize: number;
   fontSize: number;
@@ -56,11 +56,10 @@ export default function MenuButton({
           },
         ]}
       >
-        <Image
-          source={icon}
-          style={{ width: iconSize, height: iconSize, marginBottom: 8 }}
-          resizeMode="contain"
-        />
+        
+        <View style={{ marginBottom: 8 }}>
+          {icon}
+        </View>
         <Text style={[styles.label, { fontSize, color }]}>{label}</Text>
       </Animated.View>
     </TouchableWithoutFeedback>
@@ -78,6 +77,6 @@ const styles = StyleSheet.create({
   label: {
     textAlign: 'center',
     fontWeight: '600',
-    fontFamily: 'Inter',
+    fontFamily: 'PatrickHand',
   },
 });

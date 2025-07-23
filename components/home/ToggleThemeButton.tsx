@@ -1,12 +1,13 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React, { useEffect, useRef } from 'react';
 import {
   Animated,
-  Image,
   StyleSheet,
-  TouchableOpacity,
+  TouchableOpacity
 } from 'react-native';
-import { useResponsive } from '../constants/responsive';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme } from '../../context/ThemeContext';
+import { useResponsive } from '../../theme/home/responsive';
+
 
 const ToggleThemeButton = () => {
   const { isDarkMode, toggleTheme } = useTheme();
@@ -68,14 +69,12 @@ const ToggleThemeButton = () => {
             },
           ]}
         >
-          <Image
-            source={
-              isDarkMode
-                ? require('../assets/images/moon.png')
-                : require('../assets/images/sun.png')
-            }
-            style={{ width: iconSize, height: iconSize, resizeMode: 'contain' }}
+          <MaterialCommunityIcons
+            name={isDarkMode ? "moon-waning-crescent" : "white-balance-sunny"}
+            size={iconSize}
+            color={isDarkMode ? "#fff" : "#ffb300"}
           />
+
         </Animated.View>
       </Animated.View>
     </TouchableOpacity>

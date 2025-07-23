@@ -1,17 +1,21 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated,
-  Image,
   StyleSheet,
   Text,
-  View,
+  View
 } from 'react-native';
-import AnimatedSideMenu from '../components/AnimatedSideMenu';
-import HeaderIcons from '../components/HeaderIcons';
-import MenuButton from '../components/MenuButton';
-import ToggleThemeButton from '../components/ToggleThemeButton';
-import { useResponsive } from '../constants/responsive';
+import HeaderIcons from '../components/home/HeaderIcons';
+import SvgComponent from '../components/home/LogoLearnByVideo';
+import MenuButton from '../components/home/MenuButton';
+import ToggleThemeButton from '../components/home/ToggleThemeButton';
 import { useTheme } from '../context/ThemeContext';
+import { useResponsive } from '../theme/home/responsive';
+
+
+
 
 export default function HomeScreen() {
   const { colors } = useTheme();
@@ -25,8 +29,7 @@ export default function HomeScreen() {
   } = useResponsive();
 
   const [menuOpen, setMenuOpen] = useState(false);
-
-  // Animated Value for drawer animation
+  const router = useRouter();
   const animatedValue = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -38,56 +41,54 @@ export default function HomeScreen() {
   }, [menuOpen]);
 
   const buttons = [
-    { id: '1', label: 'DEUTSCHER FILM', icon: require('../assets/images/german-film.png') },
-    { id: '2', label: 'ENGLISH FILM', icon: require('../assets/images/english-film.png') },
-    { id: '3', label: 'DEUTSCHER PODCAST', icon: require('../assets/images/german_microphone.png') },
-    { id: '4', label: 'ENGLISH PODCAST', icon: require('../assets/images/english_microphone.png') },
+    { id: '1', label: 'DEUTSCHER FILM', icon: 'movie-open-play', iconColor: '#ff9800'}, 
+    { id: '2', label: 'ENGLISH FILM', icon: 'movie-open-play', iconColor: '#e91e63' },   
+    { id: '3', label: 'DEUTSCHER PODCAST', icon: 'google-podcast', iconColor: '#283593' },
+    { id: '4', label: 'ENGLISH PODCAST', icon: 'google-podcast', iconColor: '#009688' }, 
   ];
-
+  
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Side Menu with animation */}
-      <AnimatedSideMenu animatedValue={animatedValue} onClose={() => setMenuOpen(false)} />
-
-      {/* Header icons */}
+      
       <HeaderIcons
-        onMenuPress={() => setMenuOpen(true)}
+       
         rightElement={<ToggleThemeButton />}
       />
-
-      {/* Logo and Title */}
       <View style={[styles.topSection, { backgroundColor: colors.topSectionBg }]}>
         <View style={[styles.rowContainer, { gap }]}>
-          <Image
-            source={require('../assets/images/logo_LearnbyVideo.png')}
-            style={{ width: logoSize, height: logoSize, resizeMode: 'contain' }}
-          />
+        <SvgComponent width={logoSize} height={logoSize} />
+
           <View style={styles.textBlock}>
             <Text style={[styles.titleText, { fontSize }]}>LEARN</Text>
             <Text style={[styles.titleText, { fontSize }]}>BY VIDEO</Text>
           </View>
         </View>
       </View>
-
-      {/* Middle Text */}
       <View style={[styles.middleSection, { backgroundColor: colors.middleSectionBg }]}>
         <Text style={[styles.middleText, { fontSize: middleFontSize, color: colors.textSecondary }]}>
           Choose your favorite way to learn.
         </Text>
       </View>
-
-      {/* Bottom Buttons Grid */}
       <View style={[styles.bottomSection, { backgroundColor: colors.bottomSectionBg }]}>
         <View style={styles.grid}>
           {buttons.map((btn) => (
             <MenuButton
               key={btn.id}
-              icon={btn.icon}
+              icon={
+                <MaterialCommunityIcons
+                  name={btn.icon as any}
+                  size={iconSize}
+                  color={btn.iconColor}
+                />
+              }
               label={btn.label}
               iconSize={iconSize}
               fontSize={labelFontSize}
               color={colors.textPrimary}
-              onPress={() => console.log(btn.label)}
+              onPress={() => {
+                if (btn.id === '1') router.push('/deutscher-film');
+               
+              }}
             />
           ))}
         </View>
@@ -97,12 +98,13 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  topSection: { flex: 3, justifyContent: 'center', alignItems: 'center' },
+  container: { flex: 1, flexDirection: 'column' },
+  topSection: { flex: 3, justifyContent: 'center', alignItems: 'center',},
   rowContainer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
   textBlock: { justifyContent: 'center' },
   titleText: {
-    fontFamily: 'RubikOne',
+    fontFamily: 'Caprasimo',
+    
     color: 'rgba(151, 241, 255, 0.92)',
     textAlign: 'left',
     textShadowColor: '#000',
@@ -119,7 +121,7 @@ const styles = StyleSheet.create({
   },
   middleText: {
     textAlign: 'center',
-    fontFamily: 'Inter',
+    fontFamily: 'PatrickHand',
     paddingHorizontal: 16,
   },
   bottomSection: {
@@ -127,6 +129,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 16,
+
   },
   grid: {
     flexDirection: 'row',

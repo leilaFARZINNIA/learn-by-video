@@ -1,23 +1,25 @@
-import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { useResponsive } from '../constants/responsive';
-import { useTheme } from '../context/ThemeContext';
+import { StyleSheet, View } from 'react-native';
+import { useTheme } from '../../context/ThemeContext';
+import { useResponsive } from '../../theme/home/responsive';
 
 interface Props {
-  onMenuPress: () => void;
+ 
   rightElement?: React.ReactNode;
+  leftElement?: React.ReactNode;
+
 }
 
-export default function HeaderIcons({ onMenuPress, rightElement }: Props) {
+export default function HeaderIcons({ leftElement, rightElement }: Props) {
   const { colors } = useTheme();
   const { iconSize, gap } = useResponsive();
 
   return (
     <View style={[styles.container, { padding: gap }]}>
-      <TouchableOpacity onPress={onMenuPress}>
-        <Ionicons name="menu" size={iconSize} color={colors.textPrimary} />
-      </TouchableOpacity>
+     
+     <View>
+    {leftElement}
+  </View>
       {rightElement && <View style={{ marginLeft: gap }}>{rightElement}</View>}
     </View>
   );
