@@ -11,6 +11,8 @@ type MenuContentProps = {
   setSelectedMenu: (idx: number) => void;
   selectedHistory: number | null;
   setSelectedHistory: (idx: number) => void;
+  onMenuPress: (idx: number) => void;
+  
 };
 
 export default function MenuContent({
@@ -19,6 +21,7 @@ export default function MenuContent({
   setSelectedMenu,
   selectedHistory,
   setSelectedHistory,
+  onMenuPress,
 }: MenuContentProps) {
   const { colors } = useTheme();
 
@@ -31,7 +34,9 @@ export default function MenuContent({
             styles.row,
             selectedMenu === idx && expanded ? { backgroundColor: colors.menuActiveBg } : null,
           ]}
-          onPress={() => setSelectedMenu(idx)}
+        
+          onPress={() => onMenuPress(idx)}
+
           activeOpacity={0.85}
         >
          

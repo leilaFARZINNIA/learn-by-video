@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTheme } from '../../context/ThemeContext';
 
 interface VideoPlayerProps {
@@ -15,6 +15,18 @@ export default function VideoPlayer({
   videoUrl, vars, isLoading, handleLoaded, setIsLoading, videoRef
 }: any) {
     const { colors } = useTheme();
+
+    useEffect(() => {
+      // Clean up on route change
+      return () => {
+        if (videoRef.current) {
+          videoRef.current.pause();
+          videoRef.current.src = '';
+          videoRef.current.load();
+        }
+      }
+    }, [location]);
+  
     
   return (
     <div style={{

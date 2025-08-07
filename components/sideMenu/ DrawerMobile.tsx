@@ -1,8 +1,10 @@
+import { useRouter } from 'expo-router';
 import React, { useRef, useState } from 'react';
 import { Animated, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import CustomHeader from '../CustomHeaderProps';
 import MenuContent from './MenuContent';
+import { MENU_ITEMS } from './menuData';
 import styles from './styles';
 
 const SIDEBAR_EXPANDED = 220;
@@ -13,6 +15,7 @@ export default function DrawerMobile({ children }: { children: React.ReactNode }
   const [selectedHistory, setSelectedHistory] = useState<number | null>(null);
   const sidebarAnim = useRef(new Animated.Value(-SIDEBAR_EXPANDED)).current;
   const { colors } = useTheme();
+    const router = useRouter();
 
   const openSidebar = () => {
     Animated.timing(sidebarAnim, {
@@ -36,7 +39,7 @@ export default function DrawerMobile({ children }: { children: React.ReactNode }
   return (
     <View style={{ flex: 1 }}>
       <CustomHeader
-        title="Learn by Video"
+        
         isSidebarOpen={expanded}
         toggleSidebar={toggleSidebar}
       />
@@ -58,13 +61,19 @@ export default function DrawerMobile({ children }: { children: React.ReactNode }
             },
           ]}
         >
-          <MenuContent
-            expanded={expanded}
-            selectedMenu={selectedMenu}
-            setSelectedMenu={setSelectedMenu}
-            selectedHistory={selectedHistory}
-            setSelectedHistory={setSelectedHistory}
-          />
+         <MenuContent
+  expanded={expanded}
+  selectedMenu={selectedMenu}
+  setSelectedMenu={setSelectedMenu}
+  selectedHistory={selectedHistory}
+  setSelectedHistory={setSelectedHistory}
+  onMenuPress={(idx) => {
+    setSelectedMenu(idx);
+    router.push(MENU_ITEMS[idx].route as any);
+    closeSidebar(); 
+  }}
+/>
+
         </Animated.View>
         {expanded && (
           <TouchableOpacity

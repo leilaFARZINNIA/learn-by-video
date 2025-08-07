@@ -1,10 +1,11 @@
 // components/Drawer/DrawerWeb.tsx
 import { Feather, FontAwesome5 } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, Image, Platform, Pressable, ScrollView, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import CustomHeader from '../CustomHeaderProps';
-import { HISTORY_ITEMS } from './menuData';
+import { HISTORY_ITEMS, MENU_ITEMS } from './menuData';
 import MenuItems from './MenuItems';
 import styles from './styles';
 
@@ -22,6 +23,8 @@ export default function DrawerWeb({ children }: { children: React.ReactNode }) {
   const [selectedMenu, setSelectedMenu] = useState<number | null>(null);
   const [selectedHistory, setSelectedHistory] = useState<number | null>(null);
   const { colors } = useTheme();
+  const router = useRouter();
+
 
   const toggleSidebar = () => {
     const newVal = expanded ? SIDEBAR_COLLAPSED : SIDEBAR_EXPANDED;
@@ -67,7 +70,7 @@ export default function DrawerWeb({ children }: { children: React.ReactNode }) {
         <CustomHeader
           toggleSidebar={toggleSidebar}
           isSidebarOpen={expanded}
-          title="Learn by Video"
+          
         />
       </View>
       {/* SIDEBAR */}
@@ -127,12 +130,18 @@ export default function DrawerWeb({ children }: { children: React.ReactNode }) {
         </View>
         {/* MENU ITEMS */}
         <MenuItems
-          expanded={expanded}
-          hoveredMenu={hoveredMenu}
-          setHoveredMenu={setHoveredMenu}
-          onMenuPress={setSelectedMenu}
-          selectedMenu={selectedMenu}
-          webPointer={webPointer}
+            expanded={expanded}
+            hoveredMenu={hoveredMenu}
+            setHoveredMenu={setHoveredMenu}
+            onMenuPress={(idx) => {
+              setSelectedMenu(idx);
+              router.push(MENU_ITEMS[idx].route as any);
+
+
+              
+            }}
+            selectedMenu={selectedMenu}
+            webPointer={webPointer}
         />
         {expanded && <View style={[styles.divider, { backgroundColor: colors.dividerMenu }]} />}
         {/* PAINTER HISTORY */}

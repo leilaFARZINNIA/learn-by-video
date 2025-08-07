@@ -2,9 +2,9 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect } from 'react';
-import DrawerContainer from '../app/sideMenu/DrawerContainer';
 import { ThemeProviderCustom } from '../context/ThemeContext';
 import { ThemeProvider } from '../theme/ThemeProvider';
+import DrawerContainer from './sideMenu';
 
 SplashScreen.preventAutoHideAsync();
 

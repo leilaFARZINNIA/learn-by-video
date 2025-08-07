@@ -44,8 +44,7 @@ const VideoTranscriptScreen: React.FC = () => {
     <div style={{
       minHeight: '100vh',
       background: colors.videoPlayerBg,
-      borderTopLeftRadius: 30,
-      borderTopRightRadius: 30,
+     
       overflow: 'hidden',
       display: 'flex',
       flexDirection: 'column',
