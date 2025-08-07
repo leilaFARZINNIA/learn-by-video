@@ -1,14 +1,20 @@
 
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
-import React from 'react';
 
-export const MENU_ITEMS = [
+type AppRoutes = '/' | '/about' | '/settings' | '/contact' | '/portfolio';
+
+export const MENU_ITEMS: {
+  icon: React.JSX.Element;
+  label: string;
+  route: AppRoutes;
+}[] = [
   { icon: <Feather name="home" size={24} color="#007aff" />, label: 'Home' , route:'/' },
   { icon: <MaterialCommunityIcons name="information-outline" size={24} color="#007aff" />, label: 'About', route:'/about' },
   { icon: <Feather name="settings" size={24} color="#007aff" />, label: 'Settings', route:'/settings'  },
   { icon: <Feather name="mail" size={24} color="#007aff" />, label: 'Contact' , route:'/contact' },
   { icon: <Feather name="briefcase" size={24} color="#007aff" />, label: 'Portfolio' , route:'/portfolio' },
 ];
+
 
 export const HISTORY_ITEMS = [
   { id: 1, title: 'Landscape Study', date: '2024-06-01' },

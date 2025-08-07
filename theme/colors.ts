@@ -36,7 +36,7 @@ export const lightColors = {
   loaderBoxBg:'rgba(255,255,255,0.22)',
   loadingText:'#2173d6',
   transcriptBorder:'rgba(255,255,255,0.65)',
-  transcriptshadow:'#406085',
+  transcriptshadow:'0 3px 28px -6px rgba(64, 96, 133, 0.17)',
   
   //menu
 
@@ -59,9 +59,29 @@ export const lightColors = {
   //header
 
   headerBg:'#f8fafc',
-  headerShadow: '#000',
+  headerShadow: '#001028',
   headerIcon: '#007aff',
   headerTitleP: '#1a2845',
+
+  //about
+  aboutBg:    'linear-gradient(180deg, #f7fbff 0%, #eaf4fb 100%)',    
+primary:    '#2178d5',      
+primaryLight: '#8ec8f8',    
+menuText:   '#1858a3',      
+menuBg:     '#e5f1fd',     
+bannerBg:   'rgba(103, 176, 255, 0.82)',  
+headerText: '#162036',     
+white:      '#fff',       
+text:       '#232b3b',      
+transparent:'transparent',
+gradient:   'linear-gradient(180deg, #eaf4fb 0%, #d2e6fa 100%)', 
+shadow:     '#70b8f6',      
+accent:     '#00c6fb',      
+success:    '#43e77c',      
+warning:    '#ffc93c',    
+error:      '#ff5c72',    
+
+  
  
 
   
@@ -133,7 +153,30 @@ export const darkColors = {
   headerIcon: '#3db0ff',
   headerTitleP: '#e9f2fb',
 
+  //aboout
+
+
+  
+  aboutBg:    '#212935',
+  primary:    '#3994e6',
+  primaryLight: '#60b5f7',
+  menuText:   '#a6cfff',
+  menuBg:     '#1b2432',
+  bannerBg:   'rgba(37, 74, 117, 0.92)',
+  headerText: '#eaf6ff',
+  white:      '#1d2433',
+  text:       '#d5e7fa',
+  transparent:'transparent',
+  gradient:   'linear-gradient(180deg, #1c2331 0%, #212c3a 100%)',
+  shadow:     '#255687',
+  accent:     '#12d1ff',
+  success:    '#28df99',
+  warning:    '#ffe082',
+  error:      '#ff8a99',           
   };
+  
+
+  
 
 
 
