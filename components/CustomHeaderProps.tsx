@@ -26,34 +26,27 @@ export default function CustomHeader({ title = '', isSidebarOpen, toggleSidebar 
       isMobile ? styles.mobile : styles.web
     ]}>
       <View style={styles.left}>
-        {isMobile && !isRoot && (
-          <>
-            <TouchableOpacity
-              onPress={() => router.back()}
-              style={styles.iconBtn}
-              accessibilityLabel="Back"
-            >
-              <Feather name="arrow-left" size={26} color={colors.headerIcon} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={toggleSidebar}
-              style={styles.iconBtn}
-              accessibilityLabel={isSidebarOpen ? "Close menu" : "Open menu"}
-            >
-              <Feather name={isSidebarOpen ? "x" : "menu"} size={26} color={colors.headerIcon} />
-            </TouchableOpacity>
-          </>
-        )}
-        {isMobile && isRoot && (
-          <TouchableOpacity
-            onPress={toggleSidebar}
-            style={styles.iconBtn}
-            accessibilityLabel={isSidebarOpen ? "Close menu" : "Open menu"}
-          >
-            <Feather name={isSidebarOpen ? "x" : "menu"} size={26} color={colors.headerIcon} />
-          </TouchableOpacity>
-        )}
-      </View>
+  {isMobile && (
+    isRoot ? (
+      <TouchableOpacity
+        onPress={toggleSidebar}
+        style={styles.iconBtn}
+        accessibilityLabel={isSidebarOpen ? "Close menu" : "Open menu"}
+      >
+        <Feather name={isSidebarOpen ? "x" : "menu"} size={26} color={colors.headerIcon} />
+      </TouchableOpacity>
+    ) : (
+      <TouchableOpacity
+        onPress={() => router.back()}
+        style={styles.iconBtn}
+        accessibilityLabel="Back"
+      >
+        <Feather name="arrow-left" size={26} color={colors.headerIcon} />
+      </TouchableOpacity>
+    )
+  )}
+</View>
+
       <Text
         numberOfLines={1}
         style={[
