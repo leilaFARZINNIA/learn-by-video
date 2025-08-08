@@ -1,36 +1,56 @@
 import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
-
-import Header from '../../components/videoPlayerWeb/Header';
-import ToggleTranscriptButton from '../../components/videoPlayerWeb/ToggleTranscriptButton';
-import TranscriptCard from '../../components/videoPlayerWeb/TranscriptCard';
-import VideoPlayer from '../../components/videoPlayerWeb/VideoPlayer';
-import { HIGHLIGHT_WORDS, TRANSCRIPT } from '../../constants/videoPlayer/transcriptData';
+import { fetchMediaById } from '../../api/mediaApi';
+import Header from '../../components/video-player-web/Header';
+import ToggleTranscriptButton from '../../components/video-player-web/ToggleTranscriptButton';
+import TranscriptCard from '../../components/video-player-web/TranscriptCard';
+import VideoPlayer from '../../components/video-player-web/VideoPlayer';
+import { HIGHLIGHT_WORDS } from '../../constants/video-player/transcript-highlight';
 import { useTheme } from '../../context/ThemeContext';
-import { getResponsiveVars } from '../../theme/videoPlayerWeb/responsive';
+import { getResponsiveVars } from '../../theme/video-player-web/responsive';
 
 const VideoTranscriptScreen: React.FC = () => {
 
-  const { url, title } = useLocalSearchParams<{ title?: string; url?: string }>();
   const [showTranscript, setShowTranscript] = useState(false);
   const [windowWidth, setWindowWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 800);
   const vars = getResponsiveVars(windowWidth, showTranscript);
   const { colors } = useTheme();
-
-
-  // Listener für Fenstergröße hinzufügen/entfernen
-  useEffect(() => {
-    const handler = () => setWindowWidth(window.innerWidth);
-    window.addEventListener('resize', handler);
-    return () => window.removeEventListener('resize', handler);
-  }, []);
-
-
-  const videoUrl = url || "https://www.w3schools.com/html/mov_bbb.mp4";
-  const videoTitle = title || "Intro";
+  const { id } = useLocalSearchParams<{ id?: string }>();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [pressed, setPressed] = useState(false);
+  const [media, setMedia] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+
+
+  // Listener für Fenstergröße hinzufügen/entfernen
+
+  
+  useEffect(() => {
+    if (!id) return;
+    setIsLoading(true);
+    fetchMediaById(id)
+    .then(data => {
+      console.log("Fetched media data: ", data); 
+      setMedia(data);
+      setLoading(false);
+    })
+      .catch(err => {
+        setIsLoading(false);
+        console.error("fetch error", err);
+      });
+  }, [id]);
+  
+
+  if (loading) return <div>Loading…</div>;
+if (!media) return <div>Error: Media not found</div>;
+
+
+
+
+
+
 
  
   const handleLoaded = () => {
@@ -40,22 +60,23 @@ const VideoTranscriptScreen: React.FC = () => {
     }, 200);
   };
 
+
+  
   return (
     <div style={{
       minHeight: '100vh',
       background: colors.videoPlayerBg,
-     
       overflow: 'hidden',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
     }}>
       {/* Kopfzeile mit Titel */}
-      <Header vars={vars} videoTitle={videoTitle} colors={colors} />
+      <Header vars={vars} videoTitle={media.media_title} colors={colors} />
       <div style={{ alignItems: 'center', width: '100%', flex: 1, display: 'flex', flexDirection: 'column' }}>
         {/* Videoplayer */}
         <VideoPlayer
-          videoUrl={videoUrl}
+          videoUrl={media.media_url}
           vars={vars}
           isLoading={isLoading}
           handleLoaded={handleLoaded}
@@ -74,7 +95,7 @@ const VideoTranscriptScreen: React.FC = () => {
         {/* Transcript Bereich */}
         <TranscriptCard
           showTranscript={showTranscript}
-          transcript={TRANSCRIPT}
+          transcript={media.media_transcript ?? ""}
           vars={vars}
           colors={colors}
           highlightWords={HIGHLIGHT_WORDS}
@@ -84,6 +105,7 @@ const VideoTranscriptScreen: React.FC = () => {
       </div>
     </div>
   );
+  
 };
 
 export default VideoTranscriptScreen;

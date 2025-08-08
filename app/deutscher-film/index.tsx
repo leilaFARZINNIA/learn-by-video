@@ -1,11 +1,15 @@
 import { useRouter } from 'expo-router';
-import React from 'react';
+
+import React, { useEffect, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { FilmListItem } from '../../components/deutscherFilm/FilmListItem';
-import NotebookSvg from '../../components/deutscherFilm/NotebookSvg';
-import { Film, films, handleFilmClick } from '../../constants/deutscherFilm/filmsData';
+import { fetchMediasByCourse } from '../../api/mediaApi';
+import { FilmListItem } from '../../components/deutscher-film/FilmListItem';
+import NotebookSvg from '../../components/deutscher-film/NotebookSvg';
 import { useTheme } from '../../context/ThemeContext';
-import { useResponsive } from '../../theme/deutscherFilm/responsive';
+import { useResponsive } from '../../theme/deutscher-film/responsive';
+import { Media } from '../../types/media';
+import { handleFilmClick } from '../../utils/handleFilmClick';
+
 
 
 
@@ -17,12 +21,38 @@ export default function DeutscherFilmScreen() {
 
   const { colors } = useTheme();
   const router = useRouter();
-
+  const [films, setFilms] = useState<Media[]>([]);
+  const [loading, setLoading] = useState(true);
   const paperWidth =papermaxWidth
   const paperHeight = paperWidth * aspectRatio;
   const padSides = paperWidth * 0.2;
   const padTop = paperHeight * 0.35;
   const padBottom = paperHeight * 0.1;
+
+  useEffect(() => {
+    fetchMediasByCourse("course_1")
+      .then(data => {
+        setFilms(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Error fetching:', err);
+        setLoading(false);
+      });
+  }, []);
+
+
+
+
+
+  if (loading) {
+    return (
+      <View style={{flex:1, justifyContent:'center', alignItems:'center'}}>
+        <Text>loading...</Text>
+      </View>
+    );
+  }
+  
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
@@ -64,20 +94,19 @@ export default function DeutscherFilmScreen() {
             contentContainerStyle={{ paddingBottom: contentPadding }}
             showsVerticalScrollIndicator={false}
           >
-            {films.map((item: Film, i: number) => (
+            {films.map((item, i) => (
               <FilmListItem
-              key={item.id}
-              text={item.title}
-              index={i}
-              isLast={i === films.length - 1}
-              color={colors.listfilm}
-              fontSize={middleFontSize}
-              dividerColor={colors.border}
-              onPress={() => {
-                handleFilmClick(router, item);
-              }}
-            />
+                key={item.media_id}
+                text={item.media_title}
+                index={i}
+                isLast={i === films.length - 1}
+                color={colors.listfilm}
+                fontSize={middleFontSize}
+                dividerColor={colors.border}
+                onPress={() => handleFilmClick(router, item)}
+              />
             ))}
+
           </ScrollView>
         </View>
       </View>

@@ -1,37 +1,28 @@
 
+import { HIGHLIGHT_WORDS } from '@/constants/video-player/transcript-highlight';
 import { Video } from 'expo-av';
 import { useLocalSearchParams } from 'expo-router';
-import React, { useRef, useState } from 'react';
-import { Animated, Easing, View } from 'react-native';
-import Header from '../../components/videoPlayer/ Header';
-import ToggleTranscriptButton from '../../components/videoPlayer/ToggleTranscriptButton';
-import Transcript from '../../components/videoPlayer/Transcript';
-import VideoPlayer from '../../components/videoPlayer/VideoPlayer';
-import { HIGHLIGHT_WORDS, TRANSCRIPT } from '../../constants/videoPlayer/transcriptData';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Easing, Text, View, } from 'react-native';
+import { fetchMediaById } from '../../api/mediaApi';
+import Header from '../../components/video-player/ Header';
+import ToggleTranscriptButton from '../../components/video-player/ToggleTranscriptButton';
+import Transcript from '../../components/video-player/Transcript';
+import VideoPlayer from '../../components/video-player/VideoPlayer';
 import { useTheme } from '../../context/ThemeContext';
-import { responsive } from '../../theme/videoPlayer/responsive';
+import { responsive } from '../../theme/video-player/responsive';
 
 export default function VideoTranscriptScreen() {
   
   const videoRef = useRef<Video>(null);
-  const { url, title } = useLocalSearchParams<{ title?: string; url?: string }>();
-  const [isLoading, setIsLoading] = useState(true);
   const [showTranscript, setShowTranscript] = useState(false);
   const [pressed, setPressed] = useState(false);
   const [isPaused, setIsPaused] = useState(true);
   const { colors } = useTheme();
-
-  // Animationswert für das Transcript (ein-/ausblenden)
+  const { id } = useLocalSearchParams<{ id?: string }>();
+  const [media, setMedia] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true)
   const transcriptAnim = useRef(new Animated.Value(0)).current;
-  React.useEffect(() => {
-    Animated.timing(transcriptAnim, {
-      toValue: showTranscript ? 1 : 0,
-      duration: 330,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: false,
-    }).start();
-  }, [showTranscript]);
-
   // Video-Handler für Autoplay und Pausenstatus
   const handleLoaded = () => {
     setIsLoading(false);
@@ -56,17 +47,52 @@ export default function VideoTranscriptScreen() {
     inputRange: [0, 1],
     outputRange: [32, 0],
   });
+  
+
+  useEffect(() => {
+    if (!id) return;
+    setIsLoading(true);
+    fetchMediaById(id)
+    .then(data => {
+      console.log("Fetched media data: ", data); 
+      setMedia(data);
+      setIsLoading(false);
+    })
+      .catch(err => {
+        setIsLoading(false);
+        console.error("fetch error", err);
+      });
+  }, [id]);
+  
+ 
+  React.useEffect(() => {
+    Animated.timing(transcriptAnim, {
+      toValue: showTranscript ? 1 : 0,
+      duration: 330,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: false,
+    }).start();
+  }, [showTranscript]);
+
+  if (isLoading || !media) {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text>{isLoading ? "Loading..." : "Error: Media not found"}</Text>
+      </View>
+    );
+  }
+  
 
   // Haupt-Renderbereich (flexibel mit Theme/Styles)
   return (
     <View style={{
       flex: 1,
-      backgroundColor: colors.videoPlayerBg, // Hintergrund aus Theme
+      backgroundColor: colors.videoPlayerBg,
       overflow: 'hidden',
     }}>
       {/* Kopfzeile mit Filmtitel */}
-      <Header title={title} />
-
+      <Header title={media.media_title} />
+  
       <View
         style={{
           alignItems: 'center',
@@ -77,20 +103,20 @@ export default function VideoTranscriptScreen() {
         {/* Videoplayer-Komponente */}
         <VideoPlayer
           videoRef={videoRef}
-          url={url}
+          url={media.media_url}
           isLoading={isLoading}
           handleLoaded={handleLoaded}
           handlePlaybackStatusUpdate={handlePlaybackStatusUpdate}
           setIsLoading={setIsLoading}
         />
-
+  
         {/* Button zum Ein-/Ausblenden des Transkripts */}
         <ToggleTranscriptButton
           showTranscript={showTranscript}
           onPress={() => setShowTranscript(!showTranscript)}
           pressed={setPressed}
         />
-
+  
         {/* Animiertes Transkript — eingeblendet bei Bedarf */}
         <Animated.View
           pointerEvents={showTranscript ? "auto" : "none"}
@@ -117,14 +143,14 @@ export default function VideoTranscriptScreen() {
         >
           {showTranscript && (
             <Transcript
-              transcript={TRANSCRIPT}
+              transcript={media.media_transcript ?? ""}
               highlightWords={HIGHLIGHT_WORDS}
             />
           )}
         </Animated.View>
-        {/* Abstand nach unten (atmend auf Mobile) */}
         <View style={{ height: 24 }} />
       </View>
     </View>
   );
+  
 }

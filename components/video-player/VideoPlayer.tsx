@@ -3,7 +3,7 @@ import { ResizeMode, Video } from 'expo-av';
 import React from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
-import { responsive } from '../../theme/videoPlayer/responsive';
+import { responsive } from '../../theme/video-player/responsive';
 
 export default function VideoPlayer({
   
