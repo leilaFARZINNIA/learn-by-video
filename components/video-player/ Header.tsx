@@ -3,7 +3,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React from 'react';
 import { Text, View } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
-import { responsive } from '../../theme/videoPlayer/responsive';
+import { responsive } from '../../theme/video-player/responsive';
 
 export default function Header({ title }: { title?: string }) {
 

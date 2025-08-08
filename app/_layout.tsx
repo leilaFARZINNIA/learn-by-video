@@ -4,7 +4,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect } from 'react';
 import { ThemeProviderCustom } from '../context/ThemeContext';
 import { ThemeProvider } from '../theme/ThemeProvider';
-import DrawerContainer from './sideMenu';
+import DrawerContainer from './side-menu';
 
 SplashScreen.preventAutoHideAsync();
 

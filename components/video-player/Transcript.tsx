@@ -3,11 +3,13 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
-import { responsive } from '../../theme/videoPlayer/responsive';
+import { responsive } from '../../theme/video-player/responsive';
+import { normalizeTranscript } from '../../utils/normalizeTranscript';
 
 
 export default function Transcript({ transcript, highlightWords }: any) {
   const { colors } = useTheme();
+  const normalizedTranscript = normalizeTranscript(transcript)
   return (
     <ScrollView style={{ flexGrow: 0 }} showsVerticalScrollIndicator contentContainerStyle={{ paddingBottom: 12 }}>
       <Text style={{
@@ -18,7 +20,7 @@ export default function Transcript({ transcript, highlightWords }: any) {
         letterSpacing: 0.2,
         fontSize: responsive.titleFont,
       }}>Transcript</Text>
-      {transcript.map((item: any, idx: number) => (
+       {normalizedTranscript.map((item, idx) => (
         <View key={idx}>
           <View style={{
             flexDirection: 'row',
@@ -46,20 +48,20 @@ export default function Transcript({ transcript, highlightWords }: any) {
               </Text>
             </View>
             <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'flex-start', minWidth: 0 }}>
-              {item.text.map((word: string, j: number) => (
+            {item.text.map((word: string, j: number) => (
                 <Text
                   key={j}
                   style={{
-                    color:highlightWords.includes(word) ? colors.highlight:colors.transcriptText,
-                    fontWeight: highlightWords.includes(word) ? '700' : '500',
+                    color:highlightWords.includes(word.replace(/[\.,!?]/g, "")) ? colors.highlight:colors.transcriptText,
+                    fontWeight: highlightWords.includes(word.replace(/[\.,!?]/g, "")) ? '700' : '500',
                     fontSize: responsive.transcriptFont,
                     borderRadius: Math.floor(responsive.transcriptFont * 0.48),
                     paddingHorizontal: responsive.transcriptFont * 0.45,
                     marginHorizontal: responsive.transcriptFont * 0.29,
                     marginBottom: 1.5,
-                    backgroundColor: highlightWords.includes(word) ? colors.highlightBg : 'transparent',
-                    borderWidth: highlightWords.includes(word) ? 0.5 : 0,
-                    borderColor: highlightWords.includes(word) ? colors.highlightBg : 'transparent',
+                    backgroundColor: highlightWords.includes(word.replace(/[\.,!?]/g, "")) ? colors.highlightBg : 'transparent',
+                    borderWidth: highlightWords.includes(word.replace(/[\.,!?]/g, "")) ? 0.5 : 0,
+                    borderColor: highlightWords.includes(word.replace(/[\.,!?]/g, "")) ? colors.highlightBg : 'transparent',
                   }}
                 >
                   {word + ' '}
