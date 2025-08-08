@@ -1,17 +1,25 @@
 import React from 'react';
 import { FaClock } from "react-icons/fa";
 import { useTheme } from '../../context/ThemeContext';
+import { normalizeTranscript } from '../../utils/normalizeTranscript';
+
 
 interface TranscriptCardProps {
   showTranscript: boolean;
-  transcript: any[];
+  transcript: string | any[]; 
   vars: any;
   colors: any;
   highlightWords: string[];
 }
 
+
 export default function TranscriptCard({ showTranscript, transcript, vars, highlightWords }: TranscriptCardProps) {
-    const { colors } = useTheme();
+
+  const { colors } = useTheme()
+  const normalizedTranscript = normalizeTranscript(transcript);
+
+
+
   return (
     <div style={{
       width: vars.CARD_WIDTH,
@@ -42,7 +50,7 @@ export default function TranscriptCard({ showTranscript, transcript, vars, highl
           }}>
             Transcript
           </div>
-          {transcript.map((item, idx) => (
+          {normalizedTranscript.map((item, idx) => (
             <React.Fragment key={idx}>
               <div style={{
                 display: 'flex',
@@ -65,9 +73,7 @@ export default function TranscriptCard({ showTranscript, transcript, vars, highl
                   alignSelf: 'flex-start',
                   marginTop: 2,
                 }}>
-
-                <FaClock size={vars.TIME_FONT - 1} color={colors.iconTimeTag} />
-                  
+                  <FaClock size={vars.TIME_FONT - 1} color={colors.iconTimeTag} />
                   <span style={{
                     fontSize: vars.TIME_FONT,
                     fontFamily: 'monospace',
@@ -89,27 +95,28 @@ export default function TranscriptCard({ showTranscript, transcript, vars, highl
                   minWidth: 0,
                 }}>
                   {item.text.map((word: string, j: number) => (
-                    <span
-                      key={j}
-                      style={{
-                        color: highlightWords.includes(word) ? colors.highlight : colors.transcriptText,
-                        fontWeight: highlightWords.includes(word) ? 700 : 500,
-                        fontSize: vars.TRANSCRIPT_FONT,
-                        borderRadius: Math.floor(vars.TRANSCRIPT_FONT * 0.48),
-                        padding: `0 ${vars.TRANSCRIPT_FONT * 0.45}px`,
-                        margin: `0 ${vars.TRANSCRIPT_FONT * 0.29}px 1.5px 0`,
-                        background: highlightWords.includes(word) ? colors.highlightBg : 'transparent',
-                        border: highlightWords.includes(word) ? colors.highlightBorder : undefined,
-                        display: 'inline-block',
-                        transition: 'all 0.18s',
-                      }}
-                    >
-                      {word + ' '}
-                    </span>
-                  ))}
+                  <span
+                    key={j}
+                    style={{
+                      color: highlightWords.includes(word.replace(/[\.,!?]/g, "")) ? colors.highlight : colors.transcriptText,
+                      fontWeight: highlightWords.includes(word.replace(/[\.,!?]/g, "")) ? 700 : 500,
+                      fontSize: vars.TRANSCRIPT_FONT,
+                      borderRadius: Math.floor(vars.TRANSCRIPT_FONT * 0.48),
+                      padding: `0 ${vars.TRANSCRIPT_FONT * 0.45}px`,
+                      margin: `0 ${vars.TRANSCRIPT_FONT * 0.29}px 1.5px 0`,
+                      background: highlightWords.includes(word.replace(/[\.,!?]/g, "")) ? colors.highlightBg : 'transparent',
+                      border: highlightWords.includes(word.replace(/[\.,!?]/g, "")) ? colors.highlightBorder : undefined,
+                      display: 'inline-block',
+                      transition: 'all 0.18s',
+                    }}
+                  >
+                    {word + ' '}
+                  </span>
+                ))}
+
                 </div>
               </div>
-              {idx !== transcript.length - 1 && (
+              {idx !== normalizedTranscript.length - 1 && (
                 <div style={{
                   height: 1,
                   background: colors.divider,
