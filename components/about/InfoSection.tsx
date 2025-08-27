@@ -10,29 +10,30 @@ const INFO = [
 ];
 
 export default function InfoSection() {
-  const { colors } = useTheme();
+  const {colors } = useTheme();
+  const about = (colors as any).about;
 
 
   const dynamicStyles = {
     infoContainer: {
-      backgroundColor: colors.transparent,
-      shadowColor: colors.transparent,
+      backgroundColor: about.transparent,
+      shadowColor: about.transparent,
     },
     header: {
-      color: colors.headerText,
+      color:about.headerText,
     },
     title: {
-      color: colors.menuText,
+      color: about.menuText,
     },
     text: {
-      color: colors.text,
+      color: about.text,
     },
     button: {
-      backgroundColor: colors.primary,
-      shadowColor: colors.primary,
+      backgroundColor: about.primary,
+      shadowColor: about.primary,
     },
     buttonText: {
-      color: colors.white,
+      color: about.white,
     },
   };
 

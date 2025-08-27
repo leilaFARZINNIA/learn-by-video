@@ -6,16 +6,17 @@ import { isMobile } from '../../theme/about/responsive';
 const MENUS = ['Hotage', 'Sanagt', 'Canous', 'WOOHOOIT'];
 
 export default function TopMenu() {
-  const { colors } = useTheme();
+  const { colors} = useTheme();
+  const about = (colors as any).about;
 
 
   const dynamic = {
     menuBtn: {
-      backgroundColor: colors.menuBg,
-      shadowColor: colors.menuText,
+      backgroundColor: about.menuBg,
+      shadowColor: about.menuText,
     },
     menuText: {
-      color: colors.menuText,
+      color: about.menuText,
     },
   };
 

@@ -1,6 +1,6 @@
 import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
-import { fetchMediaById } from '../../api/mediaApi';
+import { fetchMediaById } from '../../api/media-api';
 import Header from '../../components/video-player-web/Header';
 import ToggleTranscriptButton from '../../components/video-player-web/ToggleTranscriptButton';
 import TranscriptCard from '../../components/video-player-web/TranscriptCard';
@@ -14,13 +14,15 @@ const VideoTranscriptScreen: React.FC = () => {
   const [showTranscript, setShowTranscript] = useState(false);
   const [windowWidth, setWindowWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 800);
   const vars = getResponsiveVars(windowWidth, showTranscript);
-  const { colors } = useTheme();
-  const { id } = useLocalSearchParams<{ id?: string }>();
+  const {  colors} = useTheme();
+  const videoplayer = (colors as any).videoplayer;
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [pressed, setPressed] = useState(false);
   const [media, setMedia] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const { media_id } = useLocalSearchParams<{ media_id?: string }>();
+  console.log("media_id param:", media_id);
 
 
 
@@ -28,9 +30,9 @@ const VideoTranscriptScreen: React.FC = () => {
 
   
   useEffect(() => {
-    if (!id) return;
+    if (!media_id) return;
     setIsLoading(true);
-    fetchMediaById(id)
+    fetchMediaById(media_id)
     .then(data => {
       console.log("Fetched media data: ", data); 
       setMedia(data);
@@ -40,12 +42,11 @@ const VideoTranscriptScreen: React.FC = () => {
         setIsLoading(false);
         console.error("fetch error", err);
       });
-  }, [id]);
+  }, [media_id]);
   
 
   if (loading) return <div>Loading…</div>;
 if (!media) return <div>Error: Media not found</div>;
-
 
 
 
@@ -65,14 +66,14 @@ if (!media) return <div>Error: Media not found</div>;
   return (
     <div style={{
       minHeight: '100vh',
-      background: colors.videoPlayerBg,
+      background: videoplayer.videoPlayerBg,
       overflow: 'hidden',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
     }}>
       {/* Kopfzeile mit Titel */}
-      <Header vars={vars} videoTitle={media.media_title} colors={colors} />
+      <Header vars={vars} videoTitle={media.media_title} colors={videoplayer} />
       <div style={{ alignItems: 'center', width: '100%', flex: 1, display: 'flex', flexDirection: 'column' }}>
         {/* Videoplayer */}
         <VideoPlayer
@@ -81,7 +82,7 @@ if (!media) return <div>Error: Media not found</div>;
           isLoading={isLoading}
           handleLoaded={handleLoaded}
           setIsLoading={setIsLoading}
-          colors={colors}
+          colors={videoplayer}
           videoRef={videoRef}
         />
         {/* Umschaltknopf für Transcript */}
@@ -90,14 +91,14 @@ if (!media) return <div>Error: Media not found</div>;
           pressed={pressed}
           setPressed={setPressed}
           onClick={() => setShowTranscript((v) => !v)}
-          colors={colors}
+          colors={videoplayer}
         />
         {/* Transcript Bereich */}
         <TranscriptCard
           showTranscript={showTranscript}
-          transcript={media.media_transcript ?? ""}
+          transcript={media.media_transcript ?? []}
           vars={vars}
-          colors={colors}
+          colors={videoplayer}
           highlightWords={HIGHLIGHT_WORDS}
         />
         {/* Abstand unten */}

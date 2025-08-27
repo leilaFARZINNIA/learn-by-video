@@ -13,7 +13,8 @@ interface CustomHeaderProps {
 export default function CustomHeader({ title = '', isSidebarOpen, toggleSidebar }: CustomHeaderProps) {
   const router = useRouter();
   const segments = useSegments();
-  const { colors } = useTheme();
+  const {  colors} = useTheme();
+  const header = (colors as any).header;
 
   const isRoot = segments.join('/') === '' || segments.join('/') === 'index';
   const windowWidth = Dimensions.get('window').width;
@@ -22,7 +23,7 @@ export default function CustomHeader({ title = '', isSidebarOpen, toggleSidebar 
   return (
     <View style={[
       styles.header,
-      { backgroundColor: colors.headerBg, shadowColor: colors.headerShadow },
+      { backgroundColor: header.headerBg, shadowColor: header.headerShadow },
       isMobile ? styles.mobile : styles.web
     ]}>
       <View style={styles.left}>
@@ -33,7 +34,7 @@ export default function CustomHeader({ title = '', isSidebarOpen, toggleSidebar 
         style={styles.iconBtn}
         accessibilityLabel={isSidebarOpen ? "Close menu" : "Open menu"}
       >
-        <Feather name={isSidebarOpen ? "x" : "menu"} size={26} color={colors.headerIcon} />
+        <Feather name={isSidebarOpen ? "x" : "menu"} size={26} color={header.headerIcon} />
       </TouchableOpacity>
     ) : (
       <TouchableOpacity
@@ -41,7 +42,7 @@ export default function CustomHeader({ title = '', isSidebarOpen, toggleSidebar 
         style={styles.iconBtn}
         accessibilityLabel="Back"
       >
-        <Feather name="arrow-left" size={26} color={colors.headerIcon} />
+        <Feather name="arrow-left" size={26} color={header.headerIcon} />
       </TouchableOpacity>
     )
   )}
@@ -51,7 +52,7 @@ export default function CustomHeader({ title = '', isSidebarOpen, toggleSidebar 
         numberOfLines={1}
         style={[
           styles.title,
-          { color: colors.headerTitleP },
+          { color: header.headerTitleP },
           isMobile ? styles.titleMobile : styles.titleWeb
         ]}
       >

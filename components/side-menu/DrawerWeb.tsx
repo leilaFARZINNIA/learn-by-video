@@ -3,11 +3,13 @@ import { Feather, FontAwesome5 } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, Image, Platform, Pressable, ScrollView, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { useAuth } from "../../context/AuthContext";
 import { useTheme } from '../../context/ThemeContext';
 import CustomHeader from '../CustomHeaderProps';
 import { HISTORY_ITEMS, MENU_ITEMS } from './menuData';
 import MenuItems from './MenuItems';
 import styles from './styles';
+
 
 const SIDEBAR_COLLAPSED = 54;
 const SIDEBAR_EXPANDED = 220;
@@ -22,8 +24,17 @@ export default function DrawerWeb({ children }: { children: React.ReactNode }) {
   const [hoveredMenu, setHoveredMenu] = useState<number | null>(null);
   const [selectedMenu, setSelectedMenu] = useState<number | null>(null);
   const [selectedHistory, setSelectedHistory] = useState<number | null>(null);
-  const { colors } = useTheme();
+  const {  colors} = useTheme();
+  const menu = (colors as any).menu;
   const router = useRouter();
+  const { user } = useAuth();
+
+const menuItemsToShow = MENU_ITEMS.filter(item => {
+  if (!user && item.route === "/dashboard") return false; 
+  if (user && item.route === "/login") return false;      
+  return true;
+});
+
 
 
   const toggleSidebar = () => {
@@ -63,7 +74,7 @@ export default function DrawerWeb({ children }: { children: React.ReactNode }) {
       flex: 1,
       flexDirection: 'row',
       minHeight: windowHeight,
-      backgroundColor: colors.background,
+      backgroundColor: menu.background,
     }}>
       {/* HEADER */}
       <View style={{ width: '100%', position: 'absolute', left: 0, top: 0, zIndex: 1200 }}>
@@ -84,9 +95,9 @@ export default function DrawerWeb({ children }: { children: React.ReactNode }) {
             height: windowHeight - HEADER_HEIGHT,
             zIndex: 999,
             position: 'absolute',
-            backgroundColor: colors.sidebarBg,
-            borderRightColor: colors.sidebarBorder,
-            shadowColor: colors.sidebarShadow,
+            backgroundColor: menu.sidebarBg,
+            borderRightColor: menu.sidebarBorder,
+            shadowColor: menu.sidebarShadow,
           }
         ]}
       >
@@ -104,7 +115,7 @@ export default function DrawerWeb({ children }: { children: React.ReactNode }) {
             }}
           >
             {isHovered && !expanded ? (
-              <Feather name="sidebar" size={26} color={colors.sidebarToggleIcon} />
+              <Feather name="sidebar" size={26} color={menu.sidebarToggleIcon} />
             ) : (
               <Image
                 source={require('../../assets/images/logo.png')}
@@ -124,46 +135,46 @@ export default function DrawerWeb({ children }: { children: React.ReactNode }) {
                 justifyContent: 'center'
               }}
             >
-              <Feather name="sidebar" size={24} color={colors.sidebarToggleIcon} />
+              <Feather name="sidebar" size={24} color={menu.sidebarToggleIcon} />
             </TouchableOpacity>
           )}
         </View>
         {/* MENU ITEMS */}
         <MenuItems
-            expanded={expanded}
-            hoveredMenu={hoveredMenu}
-            setHoveredMenu={setHoveredMenu}
-            onMenuPress={(idx) => {
-              setSelectedMenu(idx);
-              router.push(MENU_ITEMS[idx].route as any);
+          expanded={expanded}
+          hoveredMenu={hoveredMenu}
+          setHoveredMenu={setHoveredMenu}
+          onMenuPress={(idx) => {
+            setSelectedMenu(idx);
+            router.push(menuItemsToShow[idx].route as any);
 
 
-              
-            }}
-            selectedMenu={selectedMenu}
-            webPointer={webPointer}
-        />
-        {expanded && <View style={[styles.divider, { backgroundColor: colors.dividerMenu }]} />}
+
+          } }
+          selectedMenu={selectedMenu}
+          webPointer={webPointer} 
+         items={menuItemsToShow}       />
+        {expanded && <View style={[styles.divider, { backgroundColor: menu.dividerMenu }]} />}
         {/* PAINTER HISTORY */}
         {expanded && (
           <>
-            <Text style={[styles.sectionTitle, { color: colors.sectionTitle }]}>Painter History</Text>
+            <Text style={[styles.sectionTitle, { color: menu.sectionTitle }]}>Painter History</Text>
             <ScrollView style={styles.historyContainer} contentContainerStyle={{ paddingBottom: 30 }}>
               {HISTORY_ITEMS.map((item, idx) => (
                 <TouchableOpacity
                   key={item.id}
                   style={[
                     styles.historyItem,
-                    { backgroundColor: selectedHistory === idx ? colors.historyActiveBg : colors.historyBg },
+                    { backgroundColor: selectedHistory === idx ? menu.historyActiveBg : menu.historyBg },
                     webPointer
                   ]}
                   onPress={() => setSelectedHistory(idx)}
                   activeOpacity={0.8}
                 >
-                  <FontAwesome5 name="paint-brush" size={18} color={colors.menuIcon} style={{ marginRight: 9 }} />
+                  <FontAwesome5 name="paint-brush" size={18} color={menu.menuIcon} style={{ marginRight: 9 }} />
                   <View>
-                    <Text style={[styles.historyTitle, { color: colors.historyTitle }]}>{item.title}</Text>
-                    <Text style={[styles.historyDate, { color: colors.historyDate }]}>{item.date}</Text>
+                    <Text style={[styles.historyTitle, { color: menu.historyTitle }]}>{item.title}</Text>
+                    <Text style={[styles.historyDate, { color: menu.historyDate }]}>{item.date}</Text>
                   </View>
                 </TouchableOpacity>
               ))}

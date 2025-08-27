@@ -10,10 +10,11 @@ export default function VideoPlayer({
   videoRef, url, isLoading, handleLoaded, handlePlaybackStatusUpdate, setIsLoading
 }: any) {
   const { colors } = useTheme();
+  const videoplayer = (colors as any).videoplayer;
   return (
     <View style={{
       width: responsive.cardWidth,
-      backgroundColor: colors.videoBg,
+      backgroundColor: videoplayer .videoBg,
       borderRadius: responsive.cardRadius,
       overflow: 'hidden',
       shadowColor: '0 11px 20px 0 rgba(64,96,133,0.19)',
@@ -22,7 +23,7 @@ export default function VideoPlayer({
       shadowRadius: 20,
       elevation: 13,
       borderWidth: 1.8,
-      borderColor: colors.videoBorder,
+      borderColor: videoplayer .videoBorder,
       alignItems: 'center',
       marginBottom: 18,
       marginTop: 8,
@@ -32,7 +33,7 @@ export default function VideoPlayer({
         aspectRatio: 16 / 9,
         borderRadius: responsive.cardRadius,
         overflow: 'hidden',
-        backgroundColor: colors.videoBg,
+        backgroundColor: videoplayer .videoBg,
         position: 'relative',
         justifyContent: 'center',
         alignItems: 'center',
@@ -46,7 +47,7 @@ export default function VideoPlayer({
             width: '100%',
             height: '100%',
             borderRadius: responsive.cardRadius,
-            backgroundColor: colors.videoBg,
+            backgroundColor:videoplayer .videoBg,
           }}
           resizeMode={ResizeMode.COVER}
           useNativeControls={true}
@@ -61,12 +62,12 @@ export default function VideoPlayer({
             ...StyleSheet.absoluteFillObject,
             justifyContent: 'center',
             alignItems: 'center',
-            backgroundColor: colors.loaderBoxBg,
+            backgroundColor: videoplayer .loaderBoxBg,
             zIndex: 99,
           }}>
-            <ActivityIndicator size="large" color={colors.loadingText} />
+            <ActivityIndicator size="large" color={videoplayer .loadingText} />
             <Text style={{
-              color: colors.loadingText,
+              color: videoplayer.loadingText,
               fontWeight: '600',
               fontSize: 15,
               marginTop: 8,
