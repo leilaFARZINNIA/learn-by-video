@@ -7,7 +7,8 @@ import { responsive } from '../../theme/video-player/responsive';
 
 export default function Header({ title }: { title?: string }) {
 
-  const { colors } = useTheme();
+  const {  colors} = useTheme();
+  const videoplayer = (colors as any).videoplayer;
 
   return (
 
@@ -19,14 +20,14 @@ export default function Header({ title }: { title?: string }) {
       marginBottom: 10,
     }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-        <MaterialCommunityIcons name="play-circle" size={responsive.headerFont} color={colors.headerBar} />
+        <MaterialCommunityIcons name="play-circle" size={responsive.headerFont} color={videoplayer .headerBar} />
         <Text style={{
           fontWeight: '800',
           fontFamily: 'serif',
           letterSpacing: 0.3,
-          color: colors.headerTitle,
+          color: videoplayer .headerTitle,
           fontSize: responsive.headerFont,
-          textShadowColor: colors.headerTitleShadow,
+          textShadowColor: videoplayer .headerTitleShadow,
           textShadowRadius: 6,
           textShadowOffset: { width: 0, height: 3 },
           marginLeft: 4,
@@ -34,7 +35,7 @@ export default function Header({ title }: { title?: string }) {
       </View>
       <View style={{
         height: 3,
-        backgroundColor: colors.headerBar,
+        backgroundColor: videoplayer .headerBar,
         borderRadius: 20,
         marginTop: 10,
         marginBottom: 8,

@@ -7,7 +7,7 @@ export const useResponsive = () => {
   return {
     isMobile,
     iconSize: isMobile ? 90 : 110,
-    headerFontSize: isMobile ? 60 : 80,
+    headerFontSize: isMobile ? 35 : 45,
     middleFontSize: isMobile ? 26: 30,
     gap: isMobile ? 16 : 20,
     paperPadding: isMobile ? 14 : 30,

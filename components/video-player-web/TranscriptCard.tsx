@@ -15,7 +15,8 @@ interface TranscriptCardProps {
 
 export default function TranscriptCard({ showTranscript, transcript, vars, highlightWords }: TranscriptCardProps) {
 
-  const { colors } = useTheme()
+  const {colors } = useTheme()
+  const videoplayer = (colors as any).videoplayer;
   const normalizedTranscript = normalizeTranscript(transcript);
 
 
@@ -24,10 +25,10 @@ export default function TranscriptCard({ showTranscript, transcript, vars, highl
     <div style={{
       width: vars.CARD_WIDTH,
       height: showTranscript ? vars.CARD_HEIGHT/1.7 : 0,
-      background: colors.cardBg,
+      background: videoplayer .cardBg,
       borderRadius: vars.CARD_RADIUS,
-      boxShadow: colors.transcriptshadow,
-      border: colors.transcriptBorder,
+      boxShadow: videoplayer .transcriptshadow,
+      border: videoplayer .transcriptBorder,
       padding: showTranscript ? vars.CARD_PADDING : 0,
       marginBottom: 35,
       alignSelf: 'center',
@@ -42,7 +43,7 @@ export default function TranscriptCard({ showTranscript, transcript, vars, highl
         <div>
           <div style={{
             fontWeight: 700,
-            color: colors.transcriptTitle,
+            color: videoplayer .transcriptTitle,
             marginBottom: 14,
             fontFamily: 'serif',
             letterSpacing: 0.2,
@@ -65,7 +66,7 @@ export default function TranscriptCard({ showTranscript, transcript, vars, highl
                   display: 'flex',
                   flexDirection: 'row',
                   alignItems: 'center',
-                  background: colors.timeTag,
+                  background: videoplayer .timeTag,
                   borderRadius: 8,
                   padding: '3px 10px',
                   marginRight: 12,
@@ -73,12 +74,12 @@ export default function TranscriptCard({ showTranscript, transcript, vars, highl
                   alignSelf: 'flex-start',
                   marginTop: 2,
                 }}>
-                  <FaClock size={vars.TIME_FONT - 1} color={colors.iconTimeTag} />
+                  <FaClock size={vars.TIME_FONT - 1} color={videoplayer .iconTimeTag} />
                   <span style={{
                     fontSize: vars.TIME_FONT,
                     fontFamily: 'monospace',
                     fontWeight: 'bold',
-                    color: colors.transcriptTitle,
+                    color: videoplayer .transcriptTitle,
                     marginLeft: 3
                   }}>
                     {`00:${String(item.time).padStart(2, '0')}`}
@@ -90,7 +91,7 @@ export default function TranscriptCard({ showTranscript, transcript, vars, highl
                   flexDirection: 'row',
                   flexWrap: 'wrap',
                   alignItems: 'flex-start',
-                  color: colors.transcriptText,
+                  color: videoplayer .transcriptText,
                   marginTop: 0.5,
                   minWidth: 0,
                 }}>
@@ -98,14 +99,14 @@ export default function TranscriptCard({ showTranscript, transcript, vars, highl
                   <span
                     key={j}
                     style={{
-                      color: highlightWords.includes(word.replace(/[\.,!?]/g, "")) ? colors.highlight : colors.transcriptText,
+                      color: highlightWords.includes(word.replace(/[\.,!?]/g, "")) ? videoplayer .highlight : videoplayer .transcriptText,
                       fontWeight: highlightWords.includes(word.replace(/[\.,!?]/g, "")) ? 700 : 500,
                       fontSize: vars.TRANSCRIPT_FONT,
                       borderRadius: Math.floor(vars.TRANSCRIPT_FONT * 0.48),
                       padding: `0 ${vars.TRANSCRIPT_FONT * 0.45}px`,
                       margin: `0 ${vars.TRANSCRIPT_FONT * 0.29}px 1.5px 0`,
-                      background: highlightWords.includes(word.replace(/[\.,!?]/g, "")) ? colors.highlightBg : 'transparent',
-                      border: highlightWords.includes(word.replace(/[\.,!?]/g, "")) ? colors.highlightBorder : undefined,
+                      background: highlightWords.includes(word.replace(/[\.,!?]/g, "")) ? videoplayer .highlightBg : 'transparent',
+                      border: highlightWords.includes(word.replace(/[\.,!?]/g, "")) ? videoplayer .highlightBorder : undefined,
                       display: 'inline-block',
                       transition: 'all 0.18s',
                     }}
@@ -119,7 +120,7 @@ export default function TranscriptCard({ showTranscript, transcript, vars, highl
               {idx !== normalizedTranscript.length - 1 && (
                 <div style={{
                   height: 1,
-                  background: colors.divider,
+                  background: videoplayer .divider,
                   margin: '15px 0',
                   width: '88%',
                   alignSelf: 'flex-end',

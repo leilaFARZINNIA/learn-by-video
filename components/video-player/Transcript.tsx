@@ -9,12 +9,13 @@ import { normalizeTranscript } from '../../utils/normalizeTranscript';
 
 export default function Transcript({ transcript, highlightWords }: any) {
   const { colors } = useTheme();
+  const videoplayer = (colors as any).videoplayer;
   const normalizedTranscript = normalizeTranscript(transcript)
   return (
     <ScrollView style={{ flexGrow: 0 }} showsVerticalScrollIndicator contentContainerStyle={{ paddingBottom: 12 }}>
       <Text style={{
         fontWeight: '700',
-        color: colors.transcriptTitle,
+        color: videoplayer.transcriptTitle,
         marginBottom: 14,
         fontFamily: 'serif',
         letterSpacing: 0.2,
@@ -33,7 +34,7 @@ export default function Transcript({ transcript, highlightWords }: any) {
             <View style={{
               flexDirection: 'row',
               alignItems: 'center',
-              backgroundColor: colors.timeTag,
+              backgroundColor: videoplayer.timeTag,
               borderRadius: 8,
               paddingHorizontal: 10,
               paddingVertical: 3,
@@ -42,8 +43,8 @@ export default function Transcript({ transcript, highlightWords }: any) {
               alignSelf: 'flex-start',
               marginTop: 2,
             }}>
-              <MaterialCommunityIcons name="clock-outline" size={responsive.timeFont - 1} color={colors.iconTimeTag}/>
-              <Text style={{ fontSize: responsive.timeFont, fontFamily: 'monospace', fontWeight: 'bold', color: colors.transcriptTitle, marginLeft: 3 }}>
+              <MaterialCommunityIcons name="clock-outline" size={responsive.timeFont - 1} color={videoplayer.iconTimeTag}/>
+              <Text style={{ fontSize: responsive.timeFont, fontFamily: 'monospace', fontWeight: 'bold', color: videoplayer.transcriptTitle, marginLeft: 3 }}>
                 {`00:${String(item.time).padStart(2, '0')}`}
               </Text>
             </View>
@@ -52,16 +53,16 @@ export default function Transcript({ transcript, highlightWords }: any) {
                 <Text
                   key={j}
                   style={{
-                    color:highlightWords.includes(word.replace(/[\.,!?]/g, "")) ? colors.highlight:colors.transcriptText,
+                    color:highlightWords.includes(word.replace(/[\.,!?]/g, "")) ? videoplayer.highlight:videoplayer.transcriptText,
                     fontWeight: highlightWords.includes(word.replace(/[\.,!?]/g, "")) ? '700' : '500',
                     fontSize: responsive.transcriptFont,
                     borderRadius: Math.floor(responsive.transcriptFont * 0.48),
                     paddingHorizontal: responsive.transcriptFont * 0.45,
                     marginHorizontal: responsive.transcriptFont * 0.29,
                     marginBottom: 1.5,
-                    backgroundColor: highlightWords.includes(word.replace(/[\.,!?]/g, "")) ? colors.highlightBg : 'transparent',
+                    backgroundColor: highlightWords.includes(word.replace(/[\.,!?]/g, "")) ? videoplayer.highlightBg : 'transparent',
                     borderWidth: highlightWords.includes(word.replace(/[\.,!?]/g, "")) ? 0.5 : 0,
-                    borderColor: highlightWords.includes(word.replace(/[\.,!?]/g, "")) ? colors.highlightBg : 'transparent',
+                    borderColor: highlightWords.includes(word.replace(/[\.,!?]/g, "")) ? videoplayer.highlightBg : 'transparent',
                   }}
                 >
                   {word + ' '}
@@ -72,7 +73,7 @@ export default function Transcript({ transcript, highlightWords }: any) {
           {idx !== transcript.length - 1 && (
             <View style={{
               height: 1,
-              backgroundColor: colors.divider,
+              backgroundColor: videoplayer.divider,
               marginVertical: 2,
               width: '88%',
               alignSelf: 'flex-end',

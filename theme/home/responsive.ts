@@ -1,19 +1,29 @@
-import { useWindowDimensions } from 'react-native';
+// theme/home/responsive.ts
+import { Platform, useWindowDimensions, type DimensionValue } from 'react-native';
 
 export const useResponsive = () => {
   const { width, height } = useWindowDimensions();
-  const isMobile = width < 420;
+  const isWeb = Platform.OS === 'web';
+
+  const BP_SM = 640;
+  const BP_LG = 1024;
+
+  const isMobile = !isWeb && width < 420;
+
+  let columns = 1;
+  if (isWeb) columns = width >= BP_LG ? 3 : width >= BP_SM ? 2 : 1;
+
+
+  const itemWidth: DimensionValue = `${100 / columns}%`;
 
   return {
-    isMobile,
-    width,
-    height,
-    logoSize: isMobile ? Math.min(width * 0.25, 120) : Math.min(width * 0.18, 140),
-    fontSize: isMobile ? Math.min(width * 0.07, 26) : Math.min(width * 0.06, 32),
-    iconSize: isMobile ? 40 : 50,
-    labelFontSize: isMobile ? 16 : 14,
-    middleFontSize: isMobile ? 18 : 24,
+    isWeb, isMobile, width, height,
+    columns, itemWidth,
+    logoSize: Math.min(width * (isMobile ? 0.5 : 0.18), isMobile ? 120 : 150),
+    fontSize: Math.min(width * (isMobile ? 0.07 : 0.06), isMobile ? 35 : 42),
+    iconSize: isMobile ? 40 : 60,
+    labelFontSize: isMobile ? 20 : 20,
+    middleFontSize: isMobile ? 22 : 26,
     gap: isMobile ? 10 : 16,
-  
   };
 };

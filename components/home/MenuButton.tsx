@@ -68,10 +68,10 @@ export default function MenuButton({
 
 const styles = StyleSheet.create({
   button: {
-    width: '45%',
+    width: '80%',
     alignItems: 'center',
     justifyContent: 'center',
-    marginVertical: 60,
+    marginVertical: 30,
     marginHorizontal: '2.5%',
   },
   label: {

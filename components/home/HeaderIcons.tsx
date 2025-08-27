@@ -1,6 +1,5 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { useTheme } from '../../context/ThemeContext';
 import { useResponsive } from '../../theme/home/responsive';
 
 interface Props {
@@ -11,7 +10,7 @@ interface Props {
 }
 
 export default function HeaderIcons({ leftElement, rightElement }: Props) {
-  const { colors } = useTheme();
+
   const { iconSize, gap } = useResponsive();
 
   return (

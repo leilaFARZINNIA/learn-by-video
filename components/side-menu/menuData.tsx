@@ -1,18 +1,32 @@
 
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 
-type AppRoutes = '/' | '/about' | '/settings' | '/contact' | '/portfolio';
+type AppRoutes =
+  | '/'
+  | '/about'
+  | '/settings'
+  | '/contact'
+  | '/portfolio'
+  | '/login'
+  | '/dashboard'
+  | '/logout';
+
+
 
 export const MENU_ITEMS: {
   icon: React.JSX.Element;
   label: string;
-  route: AppRoutes;
+  route: string; 
 }[] = [
   { icon: <Feather name="home" size={24} color="#007aff" />, label: 'Home' , route:'/' },
   { icon: <MaterialCommunityIcons name="information-outline" size={24} color="#007aff" />, label: 'About', route:'/about' },
   { icon: <Feather name="settings" size={24} color="#007aff" />, label: 'Settings', route:'/settings'  },
   { icon: <Feather name="mail" size={24} color="#007aff" />, label: 'Contact' , route:'/contact' },
   { icon: <Feather name="briefcase" size={24} color="#007aff" />, label: 'Portfolio' , route:'/portfolio' },
+
+  { icon: <Feather name="log-in" size={24} color="#007aff" />, label: 'Login', route: '/login' },
+  { icon: <Feather name="user" size={24} color="#007aff" />, label: 'Dashboard', route: '/dashboard' },
+  
 ];
 
 

@@ -4,8 +4,8 @@ export const HIGHLIGHT_WORDS = [
     'Willkommen', 
     'photosynthesis.', 
     'food.', 
-    'formula.',
-    'Lola'
+    'Part',
+    'React'
     
   ];
   

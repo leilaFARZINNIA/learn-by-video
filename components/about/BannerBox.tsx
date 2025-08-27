@@ -4,42 +4,43 @@ import { useTheme } from '../../context/ThemeContext';
 import { isMobile } from '../../theme/about/responsive';
 
 export default function BannerBox() {
-  const { colors } = useTheme();
+  const { colors} = useTheme();
+  const about = (colors as any).about;
 
 
   const dynamic = {
     bannerBox: {
-      backgroundColor: colors.bannerBg,
-      shadowColor: colors.shadow,
+      backgroundColor:  about.bannerBg,
+      shadowColor:  about.shadow,
       shadowOffset: { width: 0, height: 18 },
       shadowOpacity: 0.19,
       shadowRadius: 36,
       elevation: 24,
     },
     circleBox: {
-      backgroundColor: colors.primary,
-      shadowColor: colors.shadow,
+      backgroundColor:  about.primary,
+      shadowColor:  about.shadow,
       shadowOffset: { width: 0, height: 16 },
       shadowOpacity: 0.25,
       shadowRadius: 40,
       elevation: 28,
     },
     aboutText: {
-      color: colors.white,
+      color:  about.white,
     },
     subtitle: {
-      color: colors.primaryLight,
+      color:  about.primaryLight,
       fontSize: isMobile ? 10 : 14,
       fontWeight: '500',
       textAlign: 'center',
       marginTop: isMobile ? 3 : 8,
     },
     ellipseImg: {
-      shadowColor: colors.primaryLight,
+      shadowColor:  about.primaryLight,
     },
     blueCircle: {
-      backgroundColor: colors.primary,
-      shadowColor: colors.shadow,
+      backgroundColor:  about.primary,
+      shadowColor:  about.shadow,
     },
   };
 

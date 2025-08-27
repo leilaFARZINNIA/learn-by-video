@@ -8,10 +8,11 @@ import { SCREEN_HEIGHT } from '../../theme/about/responsive';
 
 export default function AboutStandard() {
   const { colors } = useTheme();
+  const about = (colors as any).about;
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: colors.aboutBg }}>
-      <View style={[styles.container, { backgroundColor: colors.aboutBg }]}>
+    <ScrollView style={{ flex: 1, backgroundColor: about.aboutBg }}>
+      <View style={[styles.container, { backgroundColor: about.aboutBg }]}>
         <TopMenu />
         <BannerBox />
         <InfoSection />
