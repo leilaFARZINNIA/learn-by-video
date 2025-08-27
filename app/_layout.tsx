@@ -2,6 +2,7 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect } from 'react';
+import { AuthProvider } from "../context/AuthContext";
 import { ThemeProviderCustom } from '../context/ThemeContext';
 import { ThemeProvider } from '../theme/ThemeProvider';
 import DrawerContainer from './side-menu';
@@ -26,6 +27,8 @@ export default function RootLayout() {
   if (!fontsLoaded) return null;
 
   return (
+    
+    <AuthProvider>
     <ThemeProviderCustom>
       <ThemeProvider>
         <DrawerContainer>
@@ -35,5 +38,6 @@ export default function RootLayout() {
         </DrawerContainer>
       </ThemeProvider>
     </ThemeProviderCustom>
+    </AuthProvider>
   );
 }

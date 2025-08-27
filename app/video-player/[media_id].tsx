@@ -4,7 +4,7 @@ import { Video } from 'expo-av';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Text, View, } from 'react-native';
-import { fetchMediaById } from '../../api/mediaApi';
+import { fetchMediaById } from '../../api/media-api';
 import Header from '../../components/video-player/ Header';
 import ToggleTranscriptButton from '../../components/video-player/ToggleTranscriptButton';
 import Transcript from '../../components/video-player/Transcript';
@@ -12,14 +12,16 @@ import VideoPlayer from '../../components/video-player/VideoPlayer';
 import { useTheme } from '../../context/ThemeContext';
 import { responsive } from '../../theme/video-player/responsive';
 
+
 export default function VideoTranscriptScreen() {
   
   const videoRef = useRef<Video>(null);
   const [showTranscript, setShowTranscript] = useState(false);
   const [pressed, setPressed] = useState(false);
   const [isPaused, setIsPaused] = useState(true);
+  const { media_id } = useLocalSearchParams<{ media_id?: string }>();
   const { colors } = useTheme();
-  const { id } = useLocalSearchParams<{ id?: string }>();
+  const videoplayer = (colors as any).videoplayer;
   const [media, setMedia] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true)
   const transcriptAnim = useRef(new Animated.Value(0)).current;
@@ -50,19 +52,12 @@ export default function VideoTranscriptScreen() {
   
 
   useEffect(() => {
-    if (!id) return;
+    if (!media_id) return;
     setIsLoading(true);
-    fetchMediaById(id)
-    .then(data => {
-      console.log("Fetched media data: ", data); 
-      setMedia(data);
-      setIsLoading(false);
-    })
-      .catch(err => {
-        setIsLoading(false);
-        console.error("fetch error", err);
-      });
-  }, [id]);
+    fetchMediaById(media_id)
+      .then(data => { setMedia(data); setIsLoading(false); })
+      .catch(err => { setIsLoading(false); console.error("fetch error", err); });
+  }, [media_id]);
   
  
   React.useEffect(() => {
@@ -87,7 +82,7 @@ export default function VideoTranscriptScreen() {
   return (
     <View style={{
       flex: 1,
-      backgroundColor: colors.videoPlayerBg,
+      backgroundColor: videoplayer.videoPlayerBg,
       overflow: 'hidden',
     }}>
       {/* Kopfzeile mit Filmtitel */}
@@ -122,15 +117,15 @@ export default function VideoTranscriptScreen() {
           pointerEvents={showTranscript ? "auto" : "none"}
           style={{
             width: responsive.cardWidth,
-            backgroundColor: colors.cardBg,
+            backgroundColor: videoplayer.cardBg,
             borderRadius: responsive.cardRadius,
-            shadowColor: colors.transcriptshadow,
+            shadowColor: videoplayer.transcriptshadow,
             shadowOffset: { width: 0, height: 8 },
             shadowOpacity: 0.13,
             shadowRadius: 14,
             elevation: 9,
             borderWidth: 1.5,
-            borderColor: colors.transcriptBorder,
+            borderColor: videoplayer.transcriptBorder,
             padding: responsive.cardPadding,
             marginBottom: 34,
             alignSelf: 'center',

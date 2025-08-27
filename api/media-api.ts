@@ -2,7 +2,7 @@
 
 import { Media } from '../types/media';
 
-const BASE_URL = "http://172.20.10.3:8000"; // Basis-URL für das Backend
+const BASE_URL = "http://localhost:8000"; // Basis-URL für das Backend
 
 // Holt alle Medien für einen bestimmten Kurs
 export async function fetchMediasByCourse(courseId: string): Promise<Media[]> {
@@ -17,3 +17,5 @@ export async function fetchMediaById(mediaId: string): Promise<Media> {
   if (!res.ok) throw new Error("Fehler beim Laden der Mediendetails");
   return await res.json();
 }
+
+

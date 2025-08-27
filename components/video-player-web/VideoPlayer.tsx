@@ -14,7 +14,8 @@ interface VideoPlayerProps {
 export default function VideoPlayer({
   videoUrl, vars, isLoading, handleLoaded, setIsLoading, videoRef
 }: any) {
-    const { colors } = useTheme();
+    const {  colors} = useTheme();
+    const videoplayer = (colors as any).videoplayer;
 
     useEffect(() => {
       // Clean up on route change
@@ -31,11 +32,11 @@ export default function VideoPlayer({
   return (
     <div style={{
       width: vars.CARD_WIDTH,
-      background: colors.videoBg,
+      background: videoplayer.videoBg,
       borderRadius: vars.CARD_RADIUS,
       overflow: 'hidden',
       boxShadow: '0 11px 20px 0 rgba(64,96,133,0.19)',
-      border: colors.videoBorder,
+      border: videoplayer.videoBorder,
       alignItems: 'center',
       marginBottom: 18,
       marginTop: 10,
@@ -48,7 +49,7 @@ export default function VideoPlayer({
         height: vars.CARD_HEIGHT,
         borderRadius: vars.CARD_RADIUS,
         overflow: 'hidden',
-        background: colors.videoBg,
+        background: videoplayer.videoBg,
         position: 'relative',
         display: 'flex',
         justifyContent: 'center',
@@ -62,7 +63,7 @@ export default function VideoPlayer({
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            background: colors.videoBg,
+            background: videoplayer.videoBg,
           }}
           controls
           onLoadedData={handleLoaded}
@@ -78,12 +79,12 @@ export default function VideoPlayer({
             flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
-            background: colors.loaderBoxBg,
+            background: videoplayer.loaderBoxBg,
             zIndex: 99,
           }}>
             <div className="loader" style={{ marginBottom: 8 }} />
             <span style={{
-              color: colors.loadingText,
+              color: videoplayer.loadingText,
               fontWeight: 600,
               fontSize: 15,
               marginTop: 8,

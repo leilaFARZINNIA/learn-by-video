@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 import React, { useRef, useState } from 'react';
 import { Animated, TouchableOpacity, View } from 'react-native';
+import { useAuth } from "../../context/AuthContext";
 import { useTheme } from '../../context/ThemeContext';
 import CustomHeader from '../CustomHeaderProps';
 import MenuContent from './MenuContent';
@@ -14,8 +15,16 @@ export default function DrawerMobile({ children }: { children: React.ReactNode }
   const [selectedMenu, setSelectedMenu] = useState<number | null>(null);
   const [selectedHistory, setSelectedHistory] = useState<number | null>(null);
   const sidebarAnim = useRef(new Animated.Value(-SIDEBAR_EXPANDED)).current;
-  const { colors } = useTheme();
-    const router = useRouter();
+  const {  colors} = useTheme();
+  const menu = (colors as any).menu;
+  const router = useRouter();
+  const { user } = useAuth();
+
+const menuItemsToShow = MENU_ITEMS.filter(item => {
+  if (!user && item.route === "/dashboard") return false; 
+  if (user && item.route === "/login") return false;      
+  return true;
+});
 
   const openSidebar = () => {
     Animated.timing(sidebarAnim, {
@@ -55,9 +64,9 @@ export default function DrawerMobile({ children }: { children: React.ReactNode }
               top: 0,
               height: '100%',
               zIndex: 999,
-              backgroundColor: colors.sidebarBg,
-              borderRightColor: colors.sidebarBorder,
-              shadowColor: colors.sidebarShadow,
+              backgroundColor:  menu.sidebarBg,
+              borderRightColor:  menu.sidebarBorder,
+              shadowColor:  menu.sidebarShadow,
             },
           ]}
         >
@@ -69,9 +78,11 @@ export default function DrawerMobile({ children }: { children: React.ReactNode }
   setSelectedHistory={setSelectedHistory}
   onMenuPress={(idx) => {
     setSelectedMenu(idx);
-    router.push(MENU_ITEMS[idx].route as any);
+    router.push(menuItemsToShow[idx].route as any);
     closeSidebar(); 
   }}
+
+  items={menuItemsToShow} 
 />
 
         </Animated.View>
@@ -79,7 +90,7 @@ export default function DrawerMobile({ children }: { children: React.ReactNode }
           <TouchableOpacity
             style={[
               styles.backdrop,
-              { backgroundColor: colors.backdrop },
+              { backgroundColor:  menu.backdrop },
             ]}
             activeOpacity={1}
             onPress={closeSidebar}

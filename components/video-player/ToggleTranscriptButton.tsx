@@ -9,6 +9,7 @@ import { useTheme } from '../../context/ThemeContext';
 export default function ToggleTranscriptButton({ showTranscript, onPress, pressed }: any) {
 
   const { colors } = useTheme();
+  const videoplayer = (colors as any).videoplayer;
  
   return (
     <TouchableOpacity
@@ -20,25 +21,25 @@ export default function ToggleTranscriptButton({ showTranscript, onPress, presse
         paddingHorizontal: 20,
         paddingVertical: 11,
         borderRadius: 18,
-        backgroundColor:  colors.bottomSectionBg,
+        backgroundColor:  videoplayer.bottomSectionBg,
         flexDirection: 'row',
         alignItems: 'center',
         elevation: 2,
-        shadowColor: colors.toggleBtnBgBoxShadow,
+        shadowColor: videoplayer.toggleBtnBgBoxShadow,
         shadowOffset: { width: 0, height: 7 },
         shadowOpacity: 0.11,
         shadowRadius: 11,
         alignSelf: 'center',
         borderWidth: 1,
-        borderColor: colors.toggleborder,
-        ...(pressed ? { backgroundColor: colors.toggleBtnBgP, transform: [{ scale: 0.97 }] } : {})
+        borderColor: videoplayer.toggleborder,
+        ...(pressed ? { backgroundColor: videoplayer.toggleBtnBgP, transform: [{ scale: 0.97 }] } : {})
       }}
       activeOpacity={0.85}
     >
       <MaterialCommunityIcons
         name={showTranscript ? "chevron-up-circle" : "chevron-down-circle"}
         size={22}
-        color={colors.toggeltext}
+        color={videoplayer.toggeltext}
         style={{
           marginRight: 1,
           transform: [{ rotate: showTranscript ? '180deg' : '0deg' }],
@@ -46,7 +47,7 @@ export default function ToggleTranscriptButton({ showTranscript, onPress, presse
       />
       <Text style={{
         fontWeight: '700',
-        color: colors.toggeltext,
+        color: videoplayer.toggeltext,
         marginLeft: 8,
         fontSize: 16,
         letterSpacing: 0.07,

@@ -10,6 +10,7 @@ export function FilmListItem({
   color,
   fontSize,
   dividerColor,
+  icon,
 }: {
   text: string;
   index: number;
@@ -18,6 +19,7 @@ export function FilmListItem({
   color: string;
   fontSize: number;
   dividerColor: string;
+  icon?: React.ReactNode;
 }) {
   return (
     <View>

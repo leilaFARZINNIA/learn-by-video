@@ -11,20 +11,21 @@ interface ToggleTranscriptButtonProps {
 }
 
 export default function ToggleTranscriptButton({ showTranscript, pressed, setPressed, onClick}: ToggleTranscriptButtonProps) {
-    const { colors } = useTheme();
+    const {  colors} = useTheme();
+    const videoplayer = (colors as any).videoplayer;
   return (
     <button
       style={{
         marginTop: 18,
         padding: '11px 20px',
         borderRadius: 18,
-        background: pressed ? colors.toggleBtnBgP : colors.toggleBtnBg,
+        background: pressed ? videoplayer.toggleBtnBgP : videoplayer.toggleBtnBg,
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
-        boxShadow: colors.toggleBtnBgBoxShadow,
+        boxShadow: videoplayer.toggleBtnBgBoxShadow,
         alignSelf: 'center',
-        border: colors.toggleborder,
+        border: videoplayer.toggleborder,
         cursor: 'pointer',
         transform: pressed ? 'scale(0.97)' : undefined,
         transition: 'all 0.11s',
@@ -37,13 +38,13 @@ export default function ToggleTranscriptButton({ showTranscript, pressed, setPre
       onMouseLeave={() => setPressed(false)}
     >
       {showTranscript ? (
-        <FaChevronUp size={22} color={colors.iconTimeTag} style={{ marginRight: 3, transition: 'transform 0.22s', transform: showTranscript ? 'rotate(180deg)' : 'none' }} />
+        <FaChevronUp size={22} color={videoplayer.iconTimeTag} style={{ marginRight: 3, transition: 'transform 0.22s', transform: showTranscript ? 'rotate(180deg)' : 'none' }} />
       ) : (
-        <FaChevronDown size={22} color={colors.iconTimeTag} style={{ marginRight: 3 }} />
+        <FaChevronDown size={22} color={videoplayer.iconTimeTag} style={{ marginRight: 3 }} />
       )}
       <span style={{
         fontWeight: 700,
-        color: colors.toggeltext,
+        color: videoplayer.toggeltext,
         marginLeft: 8,
         fontSize: 16,
         letterSpacing: 0.07,

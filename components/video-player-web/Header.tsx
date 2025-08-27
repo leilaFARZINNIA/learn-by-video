@@ -10,6 +10,7 @@ interface HeaderProps {
 
 export default function Header({ vars, videoTitle }: HeaderProps) {
       const { colors } = useTheme();
+      const videoplayer = (colors as any).videoplayer;
   return (
     <div style={{
       width: vars.CARD_WIDTH,
@@ -27,14 +28,14 @@ export default function Header({ vars, videoTitle }: HeaderProps) {
         alignItems: 'center',
         gap: 5,
       }}>
-        <FaPlayCircle size={vars.HEADER_FONT} color={colors.iconTimeTag} />
+        <FaPlayCircle size={vars.HEADER_FONT} color={ videoplayer.iconTimeTag} />
         <span style={{
           fontWeight: 800,
           fontFamily: 'serif',
           letterSpacing: 0.3,
-          color: colors.headerTitle,
+          color:  videoplayer.headerTitle,
           fontSize: vars.HEADER_FONT,
-          textShadow: colors.headerTitleShadow,
+          textShadow:  videoplayer.headerTitleShadow,
           marginLeft: 4,
         }}>
           {videoTitle}
@@ -42,7 +43,7 @@ export default function Header({ vars, videoTitle }: HeaderProps) {
       </div>
       <div style={{
         height: 3,
-        background: colors.headerBar,
+        background: videoplayer.headerBar,
         borderRadius: 20,
         marginTop: 10,
         marginBottom: 8,
