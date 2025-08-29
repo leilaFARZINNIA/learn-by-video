@@ -2,7 +2,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../auth/auth-context";
 import { useTheme } from '../../context/ThemeContext';
 import { HISTORY_ITEMS } from './menuData';
 import styles from './styles';
