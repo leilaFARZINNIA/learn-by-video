@@ -4,6 +4,7 @@ import { dashboardColors } from "./dashboard/colors";
 import { dashboarddetail } from "./dashboard/detail/colors";
 import { header } from "./header/colors";
 import { homeColors } from "./home/colors";
+import { login } from "./login/colors";
 import { menu } from "./menu/colors";
 import { videoplayer } from "./video-player/colors";
 export const lightColors = {
@@ -17,6 +18,7 @@ export const lightColors = {
   about: about.light,
   dashboarddetail: dashboarddetail.light,
   dashboardColors: dashboardColors.light,
+  login: login.light,
 
  
   
@@ -35,6 +37,7 @@ export const darkColors = {
   about: about.dark,
   dashboarddetail: dashboarddetail.dark,
   dashboardColors: dashboardColors.dark,
+  login: login.dark,
 
      
   };

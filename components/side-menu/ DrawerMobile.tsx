@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import React, { useRef, useState } from 'react';
 import { Animated, TouchableOpacity, View } from 'react-native';
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../auth/auth-context";
 import { useTheme } from '../../context/ThemeContext';
 import CustomHeader from '../CustomHeaderProps';
 import MenuContent from './MenuContent';
