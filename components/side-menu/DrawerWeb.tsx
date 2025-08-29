@@ -3,7 +3,7 @@ import { Feather, FontAwesome5 } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, Image, Platform, Pressable, ScrollView, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../auth/auth-context";
 import { useTheme } from '../../context/ThemeContext';
 import CustomHeader from '../CustomHeaderProps';
 import { HISTORY_ITEMS, MENU_ITEMS } from './menuData';

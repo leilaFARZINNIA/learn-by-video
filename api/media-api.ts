@@ -1,21 +1,14 @@
-// api/mediaApi.ts
+// src/api/mediaApi.ts
+import api from "./axiosClient";
 
-import { Media } from '../types/media';
+import type { Media } from "../types/media";
 
-const BASE_URL = "http://localhost:8000"; // Basis-URL für das Backend
-
-// Holt alle Medien für einen bestimmten Kurs
 export async function fetchMediasByCourse(courseId: string): Promise<Media[]> {
-  const res = await fetch(`${BASE_URL}/courses/${courseId}/medias`);
-  if (!res.ok) throw new Error("Fehler beim Laden der Medien für diesen Kurs");
-  return await res.json();
+  const { data } = await api.get<Media[]>(`/courses/${courseId}/medias`);
+  return data;
 }
 
-// Holt die Detaildaten zu einem bestimmten Medium (über media_id)
 export async function fetchMediaById(mediaId: string): Promise<Media> {
-  const res = await fetch(`${BASE_URL}/medias/${mediaId}`);
-  if (!res.ok) throw new Error("Fehler beim Laden der Mediendetails");
-  return await res.json();
+  const { data } = await api.get<Media>(`/medias/${mediaId}`);
+  return data;
 }
-
-

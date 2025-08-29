@@ -8,13 +8,25 @@
     "scheme": "learnbyvideo",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "extra": {
+      "googleClientIdWeb": "977010988808-33abcmhc07rtaaujjn297ijdskf9a0e5.apps.googleusercontent.com",
+      "googleClientIdIos": "977010988808-q4m4n0v9jrrh4t7sgok6luh4dv4ecotp.apps.googleusercontent.com",
+      "googleClientIdAndroid": "977010988808-vuv8uhp01s7pt32v0uqe1mt0c5iichcf.apps.googleusercontent.com"
+    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.learnbyvideo.app"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#ffffff",
+        "package": "com.learnbyvideo.app"
       },
       "edgeToEdgeEnabled": true
     },
@@ -36,7 +48,8 @@
       ],
       "expo-font",
       "expo-video",
-      "expo-audio"
+      "expo-audio",
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true

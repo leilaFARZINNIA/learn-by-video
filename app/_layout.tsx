@@ -1,8 +1,8 @@
+import { AuthProvider } from '@/auth/auth-context';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect } from 'react';
-import { AuthProvider } from "../context/AuthContext";
 import { ThemeProviderCustom } from '../context/ThemeContext';
 import { ThemeProvider } from '../theme/ThemeProvider';
 import DrawerContainer from './side-menu';
