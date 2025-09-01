@@ -7,7 +7,7 @@ import { responsive } from '../../theme/video-player/responsive';
 
 export default function VideoPlayer({
   
-  videoRef, url, isLoading, handleLoaded, handlePlaybackStatusUpdate, setIsLoading
+  videoRef, url, isLoading, handleLoaded, handlePlaybackStatusUpdate, setIsLoading,
 }: any) {
   const { colors } = useTheme();
   const videoplayer = (colors as any).videoplayer;
@@ -48,6 +48,7 @@ export default function VideoPlayer({
             height: '100%',
             borderRadius: responsive.cardRadius,
             backgroundColor:videoplayer .videoBg,
+            
           }}
           resizeMode={ResizeMode.COVER}
           useNativeControls={true}
@@ -56,6 +57,7 @@ export default function VideoPlayer({
           onLoad={handleLoaded}
           onError={() => setIsLoading(false)}
           onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
+          progressUpdateIntervalMillis={150}  
         />
         {isLoading && (
           <View style={{

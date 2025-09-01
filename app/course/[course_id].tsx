@@ -54,10 +54,20 @@ export default function CourseDetailScreen() {
     title: m.media_title,
     type: (type as "video" | "podcast" | "text") ?? "video",
   }))}
+
+
+  
+  
   onItemPress={(item) => {
     console.log("press", item.id);
-    router.push(`/video-player/${encodeURIComponent(String(item.id))}`);
+    if (item.type === "video") router.push(`/video-player/${encodeURIComponent(String(item.id))}`);
+    if (item.type === "text") router.push(`/video-player/${encodeURIComponent(String(item.id))}`);
+    if (item.type === "podcast") router.push(`/podcast/${encodeURIComponent(String(item.id))}`);
+    
   }}
+
+
+  
 />
 
     );
