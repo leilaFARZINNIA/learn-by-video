@@ -5,7 +5,9 @@ import { useResponsive } from "../../../theme/courselist/responsive";
 import { FilmListItem } from "../FilmListItem";
 import NotebookSvg from "../NotebookSvg";
 
-export type NotebookItem = { id: string; title: string };
+export type NotebookItem = {
+  type: string; id: string; title: string 
+};
 
 type Props = {
   title: string;              

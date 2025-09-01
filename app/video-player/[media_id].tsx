@@ -1,5 +1,6 @@
 
 import { HIGHLIGHT_WORDS } from '@/constants/video-player/transcript-highlight';
+import { useAutoStopMedia } from '@/utils/mediaLifecycle';
 import { Video } from 'expo-av';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
@@ -16,6 +17,7 @@ import { responsive } from '../../theme/video-player/responsive';
 export default function VideoTranscriptScreen() {
   
   const videoRef = useRef<Video>(null);
+  useAutoStopMedia({ videoRef, mode: 'unload' });
   const [showTranscript, setShowTranscript] = useState(false);
   const [pressed, setPressed] = useState(false);
   const [isPaused, setIsPaused] = useState(true);
@@ -25,6 +27,7 @@ export default function VideoTranscriptScreen() {
   const [media, setMedia] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true)
   const transcriptAnim = useRef(new Animated.Value(0)).current;
+  const [currentSec, setCurrentSec] = useState(0);
   // Video-Handler für Autoplay und Pausenstatus
   const handleLoaded = () => {
     setIsLoading(false);
@@ -37,6 +40,7 @@ export default function VideoTranscriptScreen() {
   const handlePlaybackStatusUpdate = (status: any) => {
     if (status.isLoaded) {
       setIsPaused(!status.isPlaying);
+      setCurrentSec((status.positionMillis ?? 0) / 1000);
     }
   };
 
@@ -50,6 +54,10 @@ export default function VideoTranscriptScreen() {
     outputRange: [32, 0],
   });
   
+
+  useEffect(() => {
+    console.log('[Screen] currentSec=', currentSec);
+  }, [currentSec]);
 
   useEffect(() => {
     if (!media_id) return;
@@ -140,6 +148,11 @@ export default function VideoTranscriptScreen() {
             <Transcript
               transcript={media.media_transcript ?? ""}
               highlightWords={HIGHLIGHT_WORDS}
+              currentTime={currentSec} 
+              onSeek={(sec) => videoRef.current?.setPositionAsync(Math.max(0, Math.floor((sec ?? 0) * 1000)))}
+              height={360}
+                        
+          
             />
           )}
         </Animated.View>
