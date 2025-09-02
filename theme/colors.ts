@@ -21,6 +21,7 @@ export const lightColors = {
   dashboardColors: dashboardColors.light,
   login: login.light,
   podcast: podcast.light,
+  text: podcast.light,
 
  
   
@@ -41,6 +42,7 @@ export const darkColors = {
   dashboardColors: dashboardColors.dark,
   login: login.dark,
   podcast: podcast.dark,
+  text: podcast.dark,
 
      
   };
