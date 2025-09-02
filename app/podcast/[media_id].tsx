@@ -9,14 +9,17 @@ import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-nat
 
 import PodcastAvatar from "@/components/podcast/PodcastAvatar";
 import TimeSlider from "@/components/podcast/TimeSlider";
+import { useResponsiveContainerStyle } from "@/theme/podcast/responsive";
 import Controls from "../../components/podcast/Controls";
 import TranscriptList from "../../components/podcast/TranscriptList";
 
-const PHONE_MAX_WIDTH = 420;
+
+
 
 export default function PodcastScreen() {
   const { colors } = useTheme();
   const podcast = (colors as any).podcast;
+  const containerStyle = useResponsiveContainerStyle({});
 
   const { media_id } = useLocalSearchParams<{ media_id?: string }>();
   const soundRef = useRef<Audio.Sound | null>(null);
@@ -156,7 +159,7 @@ export default function PodcastScreen() {
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: podcast.bg }} contentContainerStyle={{ padding: 18, paddingBottom: 40, alignItems: "center" }}>
-      <View style={{ width: "100%", maxWidth: PHONE_MAX_WIDTH }}>
+      <View style={ containerStyle}>
         {/* Header card */}
         <View style={{
           width: "100%",

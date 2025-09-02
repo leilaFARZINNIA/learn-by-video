@@ -16,20 +16,17 @@ const VideoTranscriptScreen: React.FC = () => {
     typeof window !== 'undefined' ? window.innerWidth : 800
   );
   const vars = getResponsiveVars(windowWidth, showTranscript);
-
   const { colors } = useTheme();
   const videoplayer = (colors as any).videoplayer;
-
   const htmlVideoRef = useRef<HTMLVideoElement>(null);
+
   useAutoStopMedia({htmlVideoRef, mode: 'unload' });
 
   const [isLoading, setIsLoading] = useState(true);
   const [pressed, setPressed] = useState(false);
   const [media, setMedia] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-
   const [currentSec, setCurrentSec] = useState(0); 
-
   const { media_id } = useLocalSearchParams<{ media_id?: string }>();
 
   

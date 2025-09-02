@@ -134,14 +134,14 @@ export default function TranscriptList({
                             key={`${original}-${i}`}
                             style={{
                               fontWeight: "700",
-                              backgroundColor: colors.greenSoft,
-                              color: colors.greenText,
+                              backgroundColor: '#eaf7d3',
+                              color: '#257600',
                               paddingHorizontal: 6,
                               paddingVertical: Platform.select({ web: 2, default: 1 }),
                               borderRadius: 6,
                               marginRight: 4,
-                              borderWidth: Platform.select({ web: 1, default: 1 }),
-                              borderColor: colors.greenBorder,
+                             
+                              
                               overflow: "hidden",
                             }}
                           >
