@@ -1,13 +1,16 @@
 import { AuthProvider } from '@/auth/auth-context';
 import { useFonts } from 'expo-font';
+import * as Linking from 'expo-linking';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import * as WebBrowser from 'expo-web-browser';
 import React, { useEffect } from 'react';
 import { ThemeProviderCustom } from '../context/ThemeContext';
 import { ThemeProvider } from '../theme/ThemeProvider';
 import DrawerContainer from './side-menu';
 
 SplashScreen.preventAutoHideAsync();
+WebBrowser.maybeCompleteAuthSession();
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -18,11 +21,12 @@ export default function RootLayout() {
   });
   
 
-  useEffect(() => {
-    if (fontsLoaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
+     useEffect(() => {
+        const sub = Linking.addEventListener('url', e => {
+          console.log('[auth] URL EVENT =', e.url);
+         });
+         return () => sub.remove();
+      }, []);
 
   if (!fontsLoaded) return null;
 

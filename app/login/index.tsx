@@ -12,10 +12,11 @@ import Hero from "../../components/login/Hero";
 import ProviderTabs, { ProviderTab } from "../../components/login/ProviderTabs";
 
 export default function LoginPage() {
-  const { user, loading, loginWithGoogle, refreshUser } = useAuth();
+
   const { logoSize, fontSize } = useResponsive();
   const { colors } = useTheme();
   const login = (colors as any).login;
+  const { user, loading, loginWithGoogle, refreshUser } = useAuth();
 
   const [providerTab, setProviderTab] = useState<ProviderTab>("google");
   const [googleBusy, setGoogleBusy] = useState(false);
@@ -61,11 +62,33 @@ export default function LoginPage() {
             <ProviderTabs active={providerTab} onChange={setProviderTab} />
 
             {providerTab === "google" && (
-              <>
-                <GoogleButton onPress={onGoogle} loading={googleBusy} />
-                {!!err && <Text style={[s.err, { color: login.error }]}>{err}</Text>}
-              </>
-            )}
+            <>
+               
+                <GoogleButton
+                  fullWidth
+                  loading={googleBusy}
+                  
+                  // disabled={!googleReady || googleBusy}
+                  disabled={googleBusy}
+                  onPress={async () => {
+                    console.log("[auth] Google button pressed");
+                    if (googleBusy) return;
+                    setGoogleBusy(true);
+                    try {
+                      await loginWithGoogle();
+                      console.log("[auth] loginWithGoogle finished");
+                    } finally {
+                      setGoogleBusy(false);
+                    }
+                  }}
+                />
+
+
+
+              {!!err && <Text style={[s.err, { color: login.error }]}>{err}</Text>}
+            </>
+          )}
+
 
             {providerTab === "email" && <EmailAuthForm onSuccess={onEmailSuccess} />}
 

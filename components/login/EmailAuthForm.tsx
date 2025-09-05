@@ -2,8 +2,11 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useMemo, useState } from "react";
 import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import api from "../../api/axiosClient";
-import { useTheme } from '../../context/ThemeContext';
+import { useTheme } from "../../context/ThemeContext";
+
+// 🔑 Firebase
+import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { app } from "../../utils/firebase";
 
 export type EmailMode = "signin" | "register";
 
@@ -23,7 +26,12 @@ export default function EmailAuthForm({ onSuccess }: Props) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
-  const title = useMemo(() => (emailMode === "signin" ? "Sign in" : "Create account"), [emailMode]);
+  const title = useMemo(
+    () => (emailMode === "signin" ? "Sign in" : "Create account"),
+    [emailMode]
+  );
+
+  const auth = getAuth(app);
 
   const onSubmitEmail = async () => {
     if (busy) return;
@@ -46,13 +54,22 @@ export default function EmailAuthForm({ onSuccess }: Props) {
     try {
       setBusy(true);
       if (emailMode === "signin") {
-        await api.post("/auth/local/login", { email: normalizedEmail, password: pass });
+        await signInWithEmailAndPassword(auth, normalizedEmail, pass);
       } else {
-        await api.post("/auth/local/register", { name: name.trim(), email: normalizedEmail, password: pass });
+        const cred = await createUserWithEmailAndPassword(
+          auth,
+          normalizedEmail,
+          pass
+        );
+        if (name.trim()) {
+          await updateProfile(cred.user, { displayName: name.trim() });
+        }
       }
       await onSuccess();
     } catch (e: any) {
-      const detail = e?.response?.data?.detail || e?.response?.data?.message || e?.message || "Operation failed";
+      console.error("[EmailAuthForm] error:", e);
+      const detail =
+        e?.code || e?.message || "Operation failed. Please try again.";
       setErr(String(detail));
     } finally {
       setBusy(false);
@@ -65,20 +82,36 @@ export default function EmailAuthForm({ onSuccess }: Props) {
       <View style={[s.segment, { backgroundColor: login.segmentBg }]}>
         <Pressable
           onPress={() => setEmailMode("signin")}
-          style={[s.segmentBtn, emailMode === "signin" && { backgroundColor: login.segmentActiveBg }]}
+          style={[
+            s.segmentBtn,
+            emailMode === "signin" && { backgroundColor: login.segmentActiveBg },
+          ]}
         >
           <Text
-            style={[s.segmentText, { color: login.textMuted }, emailMode === "signin" && { color: login.text }]}
+            style={[
+              s.segmentText,
+              { color: login.textMuted },
+              emailMode === "signin" && { color: login.text },
+            ]}
           >
             Sign in
           </Text>
         </Pressable>
         <Pressable
           onPress={() => setEmailMode("register")}
-          style={[s.segmentBtn, emailMode === "register" && { backgroundColor: login.segmentActiveBg }]}
+          style={[
+            s.segmentBtn,
+            emailMode === "register" && {
+              backgroundColor: login.segmentActiveBg,
+            },
+          ]}
         >
           <Text
-            style={[s.segmentText, { color: login.textMuted }, emailMode === "register" && { color: login.text }]}
+            style={[
+              s.segmentText,
+              { color: login.textMuted },
+              emailMode === "register" && { color: login.text },
+            ]}
           >
             Register
           </Text>
@@ -92,7 +125,14 @@ export default function EmailAuthForm({ onSuccess }: Props) {
           placeholder="Full name"
           placeholderTextColor={login.textMuted}
           autoCapitalize="words"
-          style={[s.input, { backgroundColor: login.inputBg, borderColor: login.inputBorder, color: login.text }]}
+          style={[
+            s.input,
+            {
+              backgroundColor: login.inputBg,
+              borderColor: login.inputBorder,
+              color: login.text,
+            },
+          ]}
           returnKeyType="next"
         />
       )}
@@ -104,7 +144,14 @@ export default function EmailAuthForm({ onSuccess }: Props) {
         placeholderTextColor={login.textMuted}
         autoCapitalize="none"
         keyboardType="email-address"
-        style={[s.input, { backgroundColor: login.inputBg, borderColor: login.inputBorder, color: login.text }]}
+        style={[
+          s.input,
+          {
+            backgroundColor: login.inputBg,
+            borderColor: login.inputBorder,
+            color: login.text,
+          },
+        ]}
         returnKeyType="next"
       />
 
@@ -117,13 +164,26 @@ export default function EmailAuthForm({ onSuccess }: Props) {
           secureTextEntry={!showPass}
           style={[
             s.input,
-            { paddingRight: 44, backgroundColor: login.inputBg, borderColor: login.inputBorder, color: login.text },
+            {
+              paddingRight: 44,
+              backgroundColor: login.inputBg,
+              borderColor: login.inputBorder,
+              color: login.text,
+            },
           ]}
           returnKeyType="go"
           onSubmitEditing={onSubmitEmail}
         />
-        <Pressable onPress={() => setShowPass((v) => !v)} style={s.eyeBtn} hitSlop={10}>
-          <Ionicons name={showPass ? "eye-off" : "eye"} size={18} color={login.textMuted} />
+        <Pressable
+          onPress={() => setShowPass((v) => !v)}
+          style={s.eyeBtn}
+          hitSlop={10}
+        >
+          <Ionicons
+            name={showPass ? "eye-off" : "eye"}
+            size={18}
+            color={login.textMuted}
+          />
         </Pressable>
       </View>
 
@@ -134,7 +194,13 @@ export default function EmailAuthForm({ onSuccess }: Props) {
         style={[s.primaryBtn, { backgroundColor: login.buttonBg }]}
         disabled={busy}
       >
-        {busy ? <ActivityIndicator color={login.buttonText} /> : <Text style={[s.primaryBtnText, { color: login.buttonText }]}>{title}</Text>}
+        {busy ? (
+          <ActivityIndicator color={login.buttonText} />
+        ) : (
+          <Text style={[s.primaryBtnText, { color: login.buttonText }]}>
+            {title}
+          </Text>
+        )}
       </Pressable>
     </View>
   );
@@ -156,7 +222,13 @@ const s = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 12,
   },
-  eyeBtn: { position: "absolute", right: 10, top: 12, padding: 6, borderRadius: 999 },
+  eyeBtn: {
+    position: "absolute",
+    right: 10,
+    top: 12,
+    padding: 6,
+    borderRadius: 999,
+  },
   primaryBtn: {
     height: 46,
     borderRadius: 12,
