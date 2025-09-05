@@ -1,109 +1,105 @@
 // auth/auth-context.tsx
 import { clearAuthToken, setAuthToken } from "@/utils/authToken";
-import * as AuthSession from "expo-auth-session";
-import * as Linking from "expo-linking";
-import * as WebBrowser from "expo-web-browser";
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import {
+  auth,
+  onAuthStateChanged,
+  signInWithGoogleWeb,
+  signOut,
+  type FirebaseUser,
+} from "@/utils/firebase";
+import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import { Platform } from "react-native";
-import api, { BASE_URL } from "../api/axiosClient";
+import { useGoogleNativeFirebase } from "./useGoogleNativeFirebase";
 
-WebBrowser.maybeCompleteAuthSession();
-
-type User = {
-  uid: string;
-  email?: string;
-  name?: string;
-  avatar?: string;
-} | null;
+type User =
+  | {
+      email?: string | null;
+      name?: string | null;
+      avatar?: string | null;
+    }
+  | null;
 
 type Ctx = {
   user: User;
   loading: boolean;
-  loginWithGoogle: () => void;
+  loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
+  googleReady: boolean; // NEW
 };
 
 const AuthCtx = createContext<Ctx>({} as any);
+
+function mapUser(u: FirebaseUser | null): User {
+  if (!u) return null;
+  return { email: u.email, name: u.displayName, avatar: u.photoURL };
+}
+
+async function cacheIdToken(u: FirebaseUser | null) {
+  if (!u) {
+    await clearAuthToken();
+    return;
+  }
+  try {
+    const t = await u.getIdToken(true);
+    if (t) await setAuthToken(t);
+  } catch {
+    /* ignore */
+  }
+}
 
 export const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const [user, setUser] = useState<User>(null);
   const [loading, setLoading] = useState(true);
   const booted = useRef(false);
 
-  // -------------------------------
-  // fetch user
-  // -------------------------------
   const refreshUser = async () => {
-    try {
-      const { data } = await api.get("/api/me", { withCredentials: true });
-      setUser(data.user);
-    } catch {
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
+    const u = auth.currentUser;
+    setUser(mapUser(u));
+    await cacheIdToken(u);
   };
+
+  // get googleReady from hook
+  const { loginWithGoogle: loginNative, googleReady } = useGoogleNativeFirebase(refreshUser);
 
   useEffect(() => {
     if (booted.current) return;
     booted.current = true;
-    refreshUser();
+
+    const unsub = onAuthStateChanged(auth, async (fbUser) => {
+      setUser(mapUser(fbUser));
+      await cacheIdToken(fbUser);
+      setLoading(false);
+    });
+    return () => unsub();
   }, []);
 
-  // -------------------------------
-  // Google Login
-  // -------------------------------
-
-
-  const redirectUri =
-  Platform.OS === "web"
-    ? `${window.location.origin}/oauthredirect`
-    : AuthSession.makeRedirectUri({ scheme: "learnbyvideo", path: "oauthredirect" });
-
-const loginWithGoogle = async () => {
-  const authUrl = `${BASE_URL}/auth/google/start?redirect_uri=${encodeURIComponent(redirectUri)}`;
-  if (Platform.OS === "web") {
-    window.location.href = authUrl;
-    return;
-  }
-  console.log("[auth] authUrl=", authUrl, "redirectUri=", redirectUri);
-  const result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUri);
-
-  if (result.type === "success" && result.url) {
-    const parsed = Linking.parse(result.url);
-    const tokenFromUrl = (parsed?.queryParams?.token as string) || "";
-    console.log("[loginWithGoogle] tokenFromUrl len=", tokenFromUrl?.length);
-    if (tokenFromUrl.length > 10) {
-      await setAuthToken(tokenFromUrl);      // ← فالبک مطمئن
+  const loginWithGoogle = async () => {
+    if (Platform.OS === "web") {
+      await signInWithGoogleWeb();
+      await refreshUser();
+      return;
     }
-    await refreshUser();
-  } else {
-    console.warn("⚠️ [loginWithGoogle] Cancelled or failed:", result.type);
-  }
-};
+    try {
+      await loginNative();
+    } catch (e) {
+      console.warn("[auth] native google login failed:", e);
+    }
+  };
 
-
-  // -------------------------------
-  // Logout
-  // -------------------------------
   const logout = async () => {
     try {
-      await api.post("/auth/logout", {}, { withCredentials: true });
+      await signOut(auth);
     } finally {
-      await clearAuthToken();   
+      await clearAuthToken();
       setUser(null);
     }
   };
 
   return (
-    <AuthCtx.Provider value={{ user, loading, loginWithGoogle, logout, refreshUser }}>
+    <AuthCtx.Provider
+      value={{ user, loading, loginWithGoogle, logout, refreshUser, googleReady }}
+    >
       {children}
     </AuthCtx.Provider>
   );

@@ -7,34 +7,58 @@
     "icon": "./assets/images/icon.png",
     "scheme": "learnbyvideo",
     "userInterfaceStyle": "automatic",
+    "owner": "leilafarzinnia",
     "newArchEnabled": true,
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
+    "platforms": ["ios", "android", "web"],
+
     "extra": {
-      "googleClientIdWeb": "977010988808-33abcmhc07rtaaujjn297ijdskf9a0e5.apps.googleusercontent.com",
-      "googleClientIdIos": "977010988808-q4m4n0v9jrrh4t7sgok6luh4dv4ecotp.apps.googleusercontent.com",
-      "googleClientIdAndroid": "977010988808-vuv8uhp01s7pt32v0uqe1mt0c5iichcf.apps.googleusercontent.com"
+      "firebaseApiKey": "AIzaSyAZQkF-R1Z3Ed6JpQtYnv7rHZ7AnIyclxw",
+      "firebaseAuthDomain": "learn-by-video-7a6b6.firebaseapp.com",
+      "firebaseProjectId": "learn-by-video-7a6b6",
+      "firebaseAppId": "1:44158199453:web:3456bfbc79aaab3fa95674",
+      "firebaseStorageBucket": "learn-by-video-7a6b6.appspot.com",
+      "firebaseMeasurementId": "G-ZNCDN8WRK9",
+      "googleClientIdIos": "44158199453-afiom83p91i8uaoofvqkc0s7fdv0e3bf.apps.googleusercontent.com",
+      "googleClientIdAndroid": "44158199453-gnop6vfjb19o50pq4rkjnhs6862aijl9.apps.googleusercontent.com"
     },
+
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.learnbyvideo.app"
+      "bundleIdentifier": "com.learnbyvideo.app",
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
+
+
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff",
-        "package": "com.learnbyvideo.app"
-      },
-      "edgeToEdgeEnabled": true
+      "package": "com.learnbyvideo.app",
+      "googleServicesFile": "./google-services.json",
+      "edgeToEdgeEnabled": true,
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "category": ["BROWSABLE", "DEFAULT"],
+          "data": [
+            {
+              "scheme": "com.googleusercontent.apps.44158199453-gnop6vfjb19o50pq4rkjnhs6862aijl9",
+              "host": "oauth2redirect",
+              "pathPrefix": "/google"
+            }
+          ]
+        },
+        {
+          "action": "VIEW",
+          "category": ["BROWSABLE", "DEFAULT"],
+          "data": [{ "scheme": "learnbyvideo" }]
+        }
+      ]
     },
+
     "web": {
       "bundler": "metro",
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
+
     "plugins": [
       "expo-router",
       [
@@ -49,8 +73,10 @@
       "expo-font",
       "expo-video",
       "expo-audio",
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-web-browser"
     ],
+
     "experiments": {
       "typedRoutes": true
     }

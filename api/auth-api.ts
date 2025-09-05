@@ -1,17 +1,37 @@
+// api/auth-api.ts
 import api from "./axiosClient";
 
-export const getMe = async () => {
-  const { data } = await api.get("/api/me");
-  return data.user;
+export type CheckResp = {
+  exists: boolean;
+  has_password?: boolean;
+  provider?: string | null;
 };
 
-export const logout = async () => {
-  await api.post("/auth/logout");
+export type Me = {
+  email: string | null;
+  name: string | null;
+  avatar?: string | null;
 };
 
-// Local auth
-export const loginLocal = (email: string, password: string) =>
-  api.post("/auth/local/login", { email, password });
+export async function checkEmail(email: string): Promise<CheckResp> {
+  const { data } = await api.get<CheckResp>("/auth/check", { params: { email } });
+  return data;
+}
 
-export const registerLocal = (name: string, email: string, password: string) =>
-  api.post("/auth/local/register", { name, email, password });
+
+export async function getMe(): Promise<Me> {
+  const { data } = await api.get<Me>("/me");
+  return data;
+}
+
+
+export async function changeUsername(username: string): Promise<void> {
+  await api.patch("/me/username", { username });
+}
+
+export async function logout(): Promise<void> {
+ 
+  const { signOut } = await import("firebase/auth");
+  const { auth } = await import("@/utils/firebase.web");
+  await signOut(auth);
+}
