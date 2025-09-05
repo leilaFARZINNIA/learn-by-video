@@ -24,7 +24,7 @@ export async function setAuthToken(t: string) {
   console.log("[authToken] set, length=", t?.length);
 }
 
-export async function getAuthToken(): Promise<string | null> {
+export async function getAuthToken(p0: boolean): Promise<string | null> {
   if (inMemoryToken) return inMemoryToken;
   let t: string | null = null;
   if (Platform.OS === "web") {
