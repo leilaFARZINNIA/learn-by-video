@@ -7,16 +7,12 @@ import {
   signOut,
   type FirebaseUser,
 } from "@/utils/firebase";
-import React, { createContext, useContext, useEffect, useRef, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Platform } from "react-native";
 import { useGoogleNativeFirebase } from "./useGoogleNativeFirebase";
 
 type User =
-  | {
-      email?: string | null;
-      name?: string | null;
-      avatar?: string | null;
-    }
+  | { email?: string | null; name?: string | null; avatar?: string | null }
   | null;
 
 type Ctx = {
@@ -25,27 +21,21 @@ type Ctx = {
   loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
-  googleReady: boolean; // NEW
+  googleReady: boolean;
 };
 
 const AuthCtx = createContext<Ctx>({} as any);
 
 function mapUser(u: FirebaseUser | null): User {
-  if (!u) return null;
-  return { email: u.email, name: u.displayName, avatar: u.photoURL };
+  return u ? { email: u.email, name: u.displayName, avatar: u.photoURL } : null;
 }
 
 async function cacheIdToken(u: FirebaseUser | null) {
-  if (!u) {
-    await clearAuthToken();
-    return;
-  }
+  if (!u) return clearAuthToken();
   try {
     const t = await u.getIdToken(true);
     if (t) await setAuthToken(t);
-  } catch {
-    /* ignore */
-  }
+  } catch {/* ignore */}
 }
 
 export const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
@@ -53,13 +43,13 @@ export const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
   const [loading, setLoading] = useState(true);
   const booted = useRef(false);
 
-  const refreshUser = async () => {
+  const refreshUser = useCallback(async () => {
     const u = auth.currentUser;
     setUser(mapUser(u));
     await cacheIdToken(u);
-  };
+  }, []);
 
-  // get googleReady from hook
+  // از هوک نیتیو (onSignedIn => refreshUser)
   const { loginWithGoogle: loginNative, googleReady } = useGoogleNativeFirebase(refreshUser);
 
   useEffect(() => {
@@ -74,35 +64,50 @@ export const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
     return () => unsub();
   }, []);
 
-  const loginWithGoogle = async () => {
+  const loginWithGoogle = useCallback(async () => {
     if (Platform.OS === "web") {
-      await signInWithGoogleWeb();
-      await refreshUser();
+      setLoading(true);
+      try {
+        await signInWithGoogleWeb();
+        await refreshUser();
+      } finally {
+        setLoading(false);
+      }
       return;
     }
+
+    if (!googleReady) {
+      console.log("[auth] Google request not ready yet");
+      return;
+    }
+
+    setLoading(true);
     try {
-      await loginNative();
+      await loginNative(); // refreshUser توسط هوک بعد از sign-in صدا زده می‌شود
     } catch (e) {
       console.warn("[auth] native google login failed:", e);
+    } finally {
+      setLoading(false);
     }
-  };
+  }, [googleReady, loginNative, refreshUser]);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
+    setLoading(true);
     try {
       await signOut(auth);
     } finally {
       await clearAuthToken();
       setUser(null);
+      setLoading(false);
     }
-  };
+  }, []);
 
-  return (
-    <AuthCtx.Provider
-      value={{ user, loading, loginWithGoogle, logout, refreshUser, googleReady }}
-    >
-      {children}
-    </AuthCtx.Provider>
+  const value = useMemo(
+    () => ({ user, loading, loginWithGoogle, logout, refreshUser, googleReady }),
+    [user, loading, loginWithGoogle, logout, refreshUser, googleReady]
   );
+
+  return <AuthCtx.Provider value={value}>{children}</AuthCtx.Provider>;
 };
 
 export const useAuth = () => useContext(AuthCtx);

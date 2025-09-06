@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "44158199453-5ho83eaq954pjivtht5akoo622i34mu4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.learnbyvideo.app",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
           "client_id": "44158199453-gnop6vfjb19o50pq4rkjnhs6862aijl9.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
