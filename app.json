@@ -19,7 +19,7 @@
       "firebaseStorageBucket": "learn-by-video-7a6b6.appspot.com",
       "firebaseMeasurementId": "G-ZNCDN8WRK9",
       "googleClientIdIos": "44158199453-afiom83p91i8uaoofvqkc0s7fdv0e3bf.apps.googleusercontent.com",
-      "googleClientIdAndroid": "44158199453-gnop6vfjb19o50pq4rkjnhs6862aijl9.apps.googleusercontent.com"
+      "googleClientIdAndroid": "44158199453-5ho83eaq954pjivtht5akoo622i34mu4.apps.googleusercontent.com"
     },
 
     "ios": {
@@ -30,28 +30,22 @@
 
 
     "android": {
-      "package": "com.learnbyvideo.app",
-      "googleServicesFile": "./google-services.json",
-      "edgeToEdgeEnabled": true,
-      "intentFilters": [
+  "package": "com.learnbyvideo.app",
+  "googleServicesFile": "./google-services.json",
+  "edgeToEdgeEnabled": true,
+  "intentFilters": [
+    {
+      "action": "VIEW",
+      "category": ["BROWSABLE", "DEFAULT"],
+      "data": [
         {
-          "action": "VIEW",
-          "category": ["BROWSABLE", "DEFAULT"],
-          "data": [
-            {
-              "scheme": "com.googleusercontent.apps.44158199453-gnop6vfjb19o50pq4rkjnhs6862aijl9",
-              "host": "oauth2redirect",
-              "pathPrefix": "/google"
-            }
-          ]
-        },
-        {
-          "action": "VIEW",
-          "category": ["BROWSABLE", "DEFAULT"],
-          "data": [{ "scheme": "learnbyvideo" }]
+         "scheme": "com.googleusercontent.apps.44158199453-5ho83eaq954pjivtht5akoo622i34mu4",
+          "path": "/oauth2redirect/google"
         }
       ]
-    },
+    }
+  ]
+},
 
     "web": {
       "bundler": "metro",

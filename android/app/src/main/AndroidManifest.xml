@@ -31,14 +31,7 @@
       </intent-filter>
       <intent-filter data-generated="true">
         <action android:name="android.intent.action.VIEW"/>
-        <data android:scheme="com.googleusercontent.apps.44158199453-gnop6vfjb19o50pq4rkjnhs6862aijl9" android:host="oauth2redirect" android:pathPrefix="/google"/>
-        <data android:scheme="exp+learn-by-video"/>
-        <category android:name="android.intent.category.BROWSABLE"/>
-        <category android:name="android.intent.category.DEFAULT"/>
-      </intent-filter>
-      <intent-filter data-generated="true">
-        <action android:name="android.intent.action.VIEW"/>
-        <data android:scheme="learnbyvideo"/>
+        <data android:scheme="com.googleusercontent.apps.44158199453-5ho83eaq954pjivtht5akoo622i34mu4" android:path="/oauth2redirect/google"/>
         <data android:scheme="exp+learn-by-video"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <category android:name="android.intent.category.DEFAULT"/>
