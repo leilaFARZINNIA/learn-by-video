@@ -7,6 +7,7 @@ import { homeColors } from "./home/colors";
 import { login } from "./login/colors";
 import { menu } from "./menu/colors";
 import { podcast } from "./podcast/colors";
+import { settings } from "./settings/colors";
 import { videoplayer } from "./video-player/colors";
 export const lightColors = {
 
@@ -22,6 +23,7 @@ export const lightColors = {
   login: login.light,
   podcast: podcast.light,
   text: podcast.light,
+  settings: settings.light,
 
  
   
@@ -43,6 +45,7 @@ export const darkColors = {
   login: login.dark,
   podcast: podcast.dark,
   text: podcast.dark,
+  settings: settings.dark,
 
      
   };

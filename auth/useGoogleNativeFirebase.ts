@@ -3,7 +3,11 @@ import { auth } from "@/utils/firebase";
 import { ResponseType, useAuthRequest } from "expo-auth-session";
 import Constants from "expo-constants";
 import * as WebBrowser from "expo-web-browser";
-import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
+import {
+  GoogleAuthProvider,
+  signInWithCredential,
+  type AuthCredential,
+} from "firebase/auth";
 import { useEffect } from "react";
 import { Platform } from "react-native";
 
@@ -15,18 +19,16 @@ const discovery = {
   tokenEndpoint: "https://oauth2.googleapis.com/token",
 };
 
-// Turn a Google client id into the reversed scheme Google expects
+// "xxx.apps.googleusercontent.com" -> "com.googleusercontent.apps.xxx"
 function toReversedScheme(googleClientId: string): string {
-  // "xxx.apps.googleusercontent.com" -> "com.googleusercontent.apps.xxx"
   return `com.googleusercontent.apps.${googleClientId.replace(
     ".apps.googleusercontent.com",
     ""
   )}`;
 }
 
-// Safer access to Expo extra in dev-client & production
+// Safer access to Expo extra (SDK 51+ / dev-client fallback)
 function getExtra(): any {
-  // SDK 51+ uses expoConfig; older has manifest/manifest2 fallbacks in dev
   // @ts-ignore
   return (
     (Constants as any).expoConfig?.extra ??
@@ -38,13 +40,15 @@ function getExtra(): any {
   );
 }
 
-export function useGoogleNativeFirebase(
-  onSignedIn?: () => Promise<void> | void
-): {
+type HookReturn = {
   request: ReturnType<typeof useAuthRequest>[0];
   loginWithGoogle: () => Promise<void>;
   googleReady: boolean;
-} {
+  /** NEW: build a credential for native reauthentication (iOS/Android) */
+  getGoogleReauthCredential: () => Promise<AuthCredential | null>;
+};
+
+export function useGoogleNativeFirebase(onSignedIn?: () => Promise<void> | void): HookReturn {
   const extra = getExtra();
 
   // Pick platform client id
@@ -55,24 +59,19 @@ export function useGoogleNativeFirebase(
     console.warn("[auth] Invalid/missing Google clientId in app config:", clientId);
   }
 
-  // Build correct redirect for each platform
-  // ANDROID MUST USE /oauth2redirect/google  (single slash after :)
+  // Build redirect for each platform
+  // ANDROID MUST USE /oauth2redirect/google (single slash after :)
   const scheme = toReversedScheme(clientId);
   const redirectUri =
     Platform.OS === "android"
       ? `${scheme}:/oauth2redirect/google`
       : `${scheme}:/oauthredirect`;
 
-  console.log("[auth] platform =", Platform.OS);
-  console.log("[auth] clientId =", clientId);
-  console.log("[auth] scheme =", scheme);
-  console.log("[auth] redirectUri =", redirectUri);
-
   const [request, , promptAsync] = useAuthRequest(
     {
       clientId,
       redirectUri,
-      responseType: ResponseType.Code, // PKCE code flow
+      responseType: ResponseType.Code, // PKCE
       usePKCE: true,
       scopes: ["openid", "email", "profile"],
       extraParams: { prompt: "select_account" },
@@ -82,45 +81,34 @@ export function useGoogleNativeFirebase(
 
   useEffect(() => {
     if (request?.url) console.log("[auth] auth URL =", request.url);
-    else console.log("[auth] auth URL not ready yet");
   }, [request]);
 
-  const loginWithGoogle = async (): Promise<void> => {
-    if (!request) {
-      console.log("[auth] Google request not ready yet");
-      return;
-    }
+  /** ---------- helpers ---------- */
+
+  // Run Google screen and exchange code -> tokens
+  const runGoogleFlowAndExchange = async (): Promise<{
+    idToken?: string;
+    accessToken?: string;
+  } | null> => {
+    if (!request) return null;
 
     await WebBrowser.warmUpAsync();
     try {
-      console.log("[auth] about to promptAsync (native)");
       let res = await promptAsync({
         useProxy: false,
         preferEphemeralSession: Platform.OS === "ios",
       } as any);
-      console.log("[auth] prompt result raw =", JSON.stringify(res, null, 2));
 
-      // If the native flow didn't return success, try proxy on Android for diagnostics
-      if (res?.type !== "success") {
-        if (Platform.OS === "android") {
-          console.log("[auth] retry with useProxy=true (diagnostic)");
-          const res2 = await promptAsync({ useProxy: true } as any);
-          console.log("[auth] prompt result (proxy) =", JSON.stringify(res2, null, 2));
-          if (res2?.type !== "success") return;
-          res = res2;
-        } else {
-          return;
-        }
+      // (Optional) fallback diagnostic proxy on Android
+      if (res?.type !== "success" && Platform.OS === "android") {
+        const res2 = await promptAsync({ useProxy: true } as any);
+        if (res2?.type === "success") res = res2;
       }
+      if (res?.type !== "success") return null;
 
       const code = (res.params as Record<string, string>)?.code;
-   
-      const codeVerifier: string | undefined = request?.codeVerifier;
-
-      if (!code || !codeVerifier) {
-        console.log("[auth] Missing code or codeVerifier", { hasCode: !!code, hasVerifier: !!codeVerifier });
-        return;
-      }
+      const codeVerifier: string | undefined = (request as any)?.codeVerifier;
+      if (!code || !codeVerifier) return null;
 
       // Exchange the code for tokens
       const body = new URLSearchParams({
@@ -137,40 +125,49 @@ export function useGoogleNativeFirebase(
         body: body.toString(),
       });
 
-      const json = (await r.json()) as {
-        id_token?: string;
-        access_token?: string;
-        error?: string;
-        error_description?: string;
-        [k: string]: any;
-      };
-
+      const json = await r.json();
       if (!r.ok) {
-        console.log("[auth] token exchange failed:", json?.error, json?.error_description, json);
-        return;
+        console.log("[auth] token exchange failed:", json?.error, json?.error_description);
+        return null;
       }
 
-      const idToken = json.id_token;
-      const accessToken = json.access_token;
-      console.log("[auth] have idToken?", !!idToken, "have accessToken?", !!accessToken);
-
-      if (!idToken && !accessToken) {
-        console.log("[auth] No idToken/accessToken in token response");
-        return;
-      }
-
-      // Sign-in to Firebase with whichever token we have
-      const cred = GoogleAuthProvider.credential(idToken ?? undefined, accessToken ?? undefined);
-      await signInWithCredential(auth, cred);
-      console.log("[auth] signInWithCredential OK");
-
-      await onSignedIn?.();
+      return { idToken: json?.id_token, accessToken: json?.access_token };
     } catch (e: any) {
       console.log("[auth] token exchange error:", e?.message ?? e);
+      return null;
     } finally {
       await WebBrowser.coolDownAsync();
     }
   };
 
-  return { request, loginWithGoogle, googleReady: !!request };
+  /** ---------- API exported by hook ---------- */
+
+  // Sign in to Firebase
+  const loginWithGoogle = async (): Promise<void> => {
+    const tokens = await runGoogleFlowAndExchange();
+    if (!tokens?.idToken && !tokens?.accessToken) return;
+
+    const cred = GoogleAuthProvider.credential(
+      tokens.idToken ?? undefined,
+      tokens.accessToken ?? undefined
+    );
+    await signInWithCredential(auth, cred);
+    await onSignedIn?.();
+  };
+
+  // NEW: Build a credential for reauthentication (native only)
+  const getGoogleReauthCredential = async (): Promise<AuthCredential | null> => {
+    try {
+      const tokens = await runGoogleFlowAndExchange();
+      if (!tokens?.idToken && !tokens?.accessToken) return null;
+      return GoogleAuthProvider.credential(
+        tokens.idToken ?? undefined,
+        tokens.accessToken ?? undefined
+      );
+    } catch {
+      return null;
+    }
+  };
+
+  return { request, loginWithGoogle, googleReady: !!request, getGoogleReauthCredential };
 }

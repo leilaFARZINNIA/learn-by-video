@@ -1,4 +1,5 @@
 import { AuthProvider } from '@/auth/auth-context';
+import { ToastProvider } from "@/components/ui/Toast";
 import { useFonts } from 'expo-font';
 import * as Linking from 'expo-linking';
 import { Stack } from 'expo-router';
@@ -35,11 +36,13 @@ export default function RootLayout() {
     <AuthProvider>
     <ThemeProviderCustom>
       <ThemeProvider>
+      <ToastProvider>
         <DrawerContainer>
        
       
         <Stack screenOptions={{ headerShown: false }} />
         </DrawerContainer>
+        </ToastProvider>
       </ThemeProvider>
     </ThemeProviderCustom>
     </AuthProvider>

@@ -1,9 +1,9 @@
 // app/login/index.tsx
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useAuth } from "../../auth/auth-context";
-import { useTheme } from '../../context/ThemeContext';
+import { useTheme } from "../../context/ThemeContext";
 import { useResponsive } from "../../theme/home/responsive";
 
 import EmailAuthForm from "../../components/login/EmailAuthForm";
@@ -11,8 +11,10 @@ import GoogleButton from "../../components/login/GoogleButton";
 import Hero from "../../components/login/Hero";
 import ProviderTabs, { ProviderTab } from "../../components/login/ProviderTabs";
 
-export default function LoginPage() {
 
+
+
+export default function LoginPage() {
   const { logoSize, fontSize } = useResponsive();
   const { colors } = useTheme();
   const login = (colors as any).login;
@@ -44,6 +46,11 @@ export default function LoginPage() {
     router.replace("/");
   };
 
+  const cardStyle = useMemo(
+    () => [s.card, { backgroundColor: login.cardBg, borderColor: login.border }],
+    [login.cardBg, login.border]
+  );
+
   if (loading) {
     return (
       <View style={s.center}>
@@ -54,48 +61,33 @@ export default function LoginPage() {
   if (user) return null;
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
+    >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
         <View style={[s.page, { backgroundColor: login.bg }]}>
           <Hero logoSize={logoSize} fontSize={fontSize} />
-          <View style={[s.card, { backgroundColor: login.cardBg, borderColor: login.border }]}>
+
+          <View style={cardStyle}>
             <ProviderTabs active={providerTab} onChange={setProviderTab} />
 
             {providerTab === "google" && (
-            <>
-               
-                <GoogleButton
-                  fullWidth
-                  loading={googleBusy}
-                  
-                  // disabled={!googleReady || googleBusy}
-                  disabled={googleBusy}
-                  onPress={async () => {
-                    console.log("[auth] Google button pressed");
-                    if (googleBusy) return;
-                    setGoogleBusy(true);
-                    try {
-                      await loginWithGoogle();
-                      console.log("[auth] loginWithGoogle finished");
-                    } finally {
-                      setGoogleBusy(false);
-                    }
-                  }}
-                />
+              <>
+                <GoogleButton fullWidth loading={googleBusy} disabled={googleBusy} onPress={onGoogle} />
+                {!!err && <Text style={[s.err, { color: login.error }]}>{err}</Text>}
+              </>
+            )}
 
+            {providerTab === "email" && (
+              <>
+                <EmailAuthForm onSuccess={onEmailSuccess} />
+                
+              </>
+            )}
 
-
-              {!!err && <Text style={[s.err, { color: login.error }]}>{err}</Text>}
-            </>
-          )}
-
-
-            {providerTab === "email" && <EmailAuthForm onSuccess={onEmailSuccess} />}
-
-            <Text style={[s.legal, { color: login.textMuted }]}>
-              By continuing you agree to our <Text style={[s.link, { color: login.link }]}>Terms</Text> &{" "}
-              <Text style={[s.link, { color: login.link }]}>Privacy</Text>.
-            </Text>
+           
           </View>
         </View>
       </ScrollView>
@@ -119,8 +111,6 @@ const s = StyleSheet.create({
     gap: 16,
     borderWidth: 1,
   },
-  link: { fontWeight: "800", textDecorationLine: "underline" },
-  legal: { textAlign: "center", fontSize: 12, marginTop: 4 },
   err: { fontWeight: "800", textAlign: "center" },
   center: { flex: 1, alignItems: "center", justifyContent: "center" },
 });
