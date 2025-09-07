@@ -4,10 +4,9 @@ import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { Animated, StatusBar, StyleSheet, Text, View } from "react-native";
 
-import HeaderIcons from "../components/home/HeaderIcons";
 import SvgComponent from "../components/home/LogoLearnByVideo";
 import MenuButton from "../components/home/MenuButton";
-import ToggleThemeButton from "../components/home/ToggleThemeButton";
+
 import { useTheme } from "../context/ThemeContext";
 import { useResponsive } from "../theme/home/responsive";
 
@@ -46,7 +45,7 @@ export default function HomeScreen() {
   return (
     <View style={[styles.container, { backgroundColor: home.background }]}>
       <StatusBar barStyle="dark-content" />
-      <HeaderIcons rightElement={<ToggleThemeButton />} />
+      
 
       {/* Top / Logo */}
       <View style={[styles.topSection, { backgroundColor: home.topSectionBg }]}>

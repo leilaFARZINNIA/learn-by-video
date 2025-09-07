@@ -1,18 +1,31 @@
 // src/components/login/EmailAuthForm.tsx
 import { Ionicons } from "@expo/vector-icons";
+import {
+  createUserWithEmailAndPassword,
+  getAuth,
+  signInWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
 import React, { useMemo, useState } from "react";
-import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  ActivityIndicator,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { useTheme } from "../../context/ThemeContext";
-
-// 🔑 Firebase
-import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { app } from "../../utils/firebase";
+import PasswordPolicyCard from "./PasswordPolicyCard";
 
 export type EmailMode = "signin" | "register";
 
-type Props = {
-  onSuccess: () => Promise<void> | void;
-};
+type Props = { onSuccess: () => Promise<void> | void };
+
+const MIN_LEN = 8;
+const MAX_LEN = 64;
 
 export default function EmailAuthForm({ onSuccess }: Props) {
   const { colors } = useTheme();
@@ -22,34 +35,45 @@ export default function EmailAuthForm({ onSuccess }: Props) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [showPass, setShowPass] = useState(false);
+  const [showPass2, setShowPass2] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
-  const title = useMemo(
-    () => (emailMode === "signin" ? "Sign in" : "Create account"),
-    [emailMode]
-  );
-
+  const title = emailMode === "signin" ? "Sign in" : "Create account";
   const auth = getAuth(app);
 
+  const emailValid = useMemo(() => /\S+@\S+\.\S+/.test(email.trim()), [email]);
+
+  const passwordError = useMemo(() => {
+    if (emailMode !== "register") return null;
+    if (pass.length > 0 && pass.length < MIN_LEN)
+      return `Password must be at least ${MIN_LEN} characters.`;
+    if (pass.length > MAX_LEN)
+      return `Password must be at most ${MAX_LEN} characters.`;
+    if (confirm.length > 0 && pass !== confirm) return "Passwords do not match.";
+    return null;
+  }, [emailMode, pass, confirm]);
+
+  const canSubmit = useMemo(() => {
+    if (busy) return false;
+    if (!emailValid) return false;
+    if (emailMode === "signin") return pass.length > 0;
+    // register
+    const baseOk =
+      name.trim().length > 0 &&
+      pass.length >= MIN_LEN &&
+      pass.length <= MAX_LEN &&
+      pass === confirm;
+    return baseOk;
+  }, [busy, emailValid, emailMode, name, pass, confirm]);
+
   const onSubmitEmail = async () => {
-    if (busy) return;
+    if (!canSubmit) return;
     setErr(null);
 
     const normalizedEmail = email.trim().toLowerCase();
-    if (!normalizedEmail.includes("@")) {
-      setErr("Please enter a valid email.");
-      return;
-    }
-    if (pass.length < 6) {
-      setErr("Password must be at least 6 characters.");
-      return;
-    }
-    if (emailMode === "register" && !name.trim()) {
-      setErr("Please enter your name.");
-      return;
-    }
 
     try {
       setBusy(true);
@@ -78,10 +102,13 @@ export default function EmailAuthForm({ onSuccess }: Props) {
 
   return (
     <View style={{ width: "100%", gap: 10 }}>
-      {/* Segment */}
+      {/* Segmented control */}
       <View style={[s.segment, { backgroundColor: login.segmentBg }]}>
         <Pressable
-          onPress={() => setEmailMode("signin")}
+          onPress={() => {
+            setEmailMode("signin");
+            setErr(null);
+          }}
           style={[
             s.segmentBtn,
             emailMode === "signin" && { backgroundColor: login.segmentActiveBg },
@@ -98,7 +125,10 @@ export default function EmailAuthForm({ onSuccess }: Props) {
           </Text>
         </Pressable>
         <Pressable
-          onPress={() => setEmailMode("register")}
+          onPress={() => {
+            setEmailMode("register");
+            setErr(null);
+          }}
           style={[
             s.segmentBtn,
             emailMode === "register" && {
@@ -125,6 +155,7 @@ export default function EmailAuthForm({ onSuccess }: Props) {
           placeholder="Full name"
           placeholderTextColor={login.textMuted}
           autoCapitalize="words"
+          autoComplete="name"
           style={[
             s.input,
             {
@@ -143,6 +174,7 @@ export default function EmailAuthForm({ onSuccess }: Props) {
         placeholder="Email address"
         placeholderTextColor={login.textMuted}
         autoCapitalize="none"
+        autoComplete="email"
         keyboardType="email-address"
         style={[
           s.input,
@@ -155,6 +187,7 @@ export default function EmailAuthForm({ onSuccess }: Props) {
         returnKeyType="next"
       />
 
+      {/* Password */}
       <View style={{ position: "relative" }}>
         <TextInput
           value={pass}
@@ -162,6 +195,7 @@ export default function EmailAuthForm({ onSuccess }: Props) {
           placeholder="Password"
           placeholderTextColor={login.textMuted}
           secureTextEntry={!showPass}
+          autoComplete={emailMode === "register" ? "new-password" : "current-password"}
           style={[
             s.input,
             {
@@ -171,35 +205,67 @@ export default function EmailAuthForm({ onSuccess }: Props) {
               color: login.text,
             },
           ]}
-          returnKeyType="go"
-          onSubmitEditing={onSubmitEmail}
+          returnKeyType={emailMode === "signin" ? "go" : "next"}
+          onSubmitEditing={emailMode === "signin" ? onSubmitEmail : undefined}
         />
-        <Pressable
-          onPress={() => setShowPass((v) => !v)}
-          style={s.eyeBtn}
-          hitSlop={10}
-        >
-          <Ionicons
-            name={showPass ? "eye-off" : "eye"}
-            size={18}
-            color={login.textMuted}
-          />
+        <Pressable onPress={() => setShowPass((v) => !v)} style={s.eyeBtn} hitSlop={10}>
+          <Ionicons name={showPass ? "eye-off" : "eye"} size={18} color={login.textMuted} />
         </Pressable>
       </View>
 
-      {!!err && <Text style={[s.err, { color: login.error }]}>{err}</Text>}
+      {/* Confirm password (register only) */}
+      {emailMode === "register" && (
+        <View style={{ position: "relative" }}>
+          <TextInput
+            value={confirm}
+            onChangeText={setConfirm}
+            placeholder="Repeat password"
+            placeholderTextColor={login.textMuted}
+            secureTextEntry={!showPass2}
+            autoComplete="new-password"
+            style={[
+              s.input,
+              {
+                paddingRight: 44,
+                backgroundColor: login.inputBg,
+                borderColor: login.inputBorder,
+                color: login.text,
+              },
+            ]}
+            returnKeyType="go"
+            onSubmitEditing={onSubmitEmail}
+          />
+          <Pressable onPress={() => setShowPass2((v) => !v)} style={s.eyeBtn} hitSlop={10}>
+            <Ionicons name={showPass2 ? "eye-off" : "eye"} size={18} color={login.textMuted} />
+          </Pressable>
+        </View>
+      )}
 
+      {/* Inline errors */}
+      {!!(err || passwordError) && (
+        <Text style={[s.err, { color: login.error }]}>{err ?? passwordError}</Text>
+      )}
+
+     
+      {emailMode === "register" && <PasswordPolicyCard />}
+
+      {/* Submit */}
       <Pressable
         onPress={onSubmitEmail}
-        style={[s.primaryBtn, { backgroundColor: login.buttonBg }]}
-        disabled={busy}
+        disabled={!canSubmit}
+        style={[
+          s.primaryBtn,
+          {
+            backgroundColor: canSubmit ? login.buttonBg : login.disabledBg ?? "#cbd5e1",
+          },
+        ]}
+        accessibilityRole="button"
+        accessibilityState={{ disabled: !canSubmit, busy }}
       >
         {busy ? (
           <ActivityIndicator color={login.buttonText} />
         ) : (
-          <Text style={[s.primaryBtnText, { color: login.buttonText }]}>
-            {title}
-          </Text>
+          <Text style={[s.primaryBtnText, { color: login.buttonText }]}>{title}</Text>
         )}
       </Pressable>
     </View>
@@ -228,6 +294,7 @@ const s = StyleSheet.create({
     top: 12,
     padding: 6,
     borderRadius: 999,
+    ...(Platform.OS === "web" ? { cursor: "pointer" } : null),
   },
   primaryBtn: {
     height: 46,
