@@ -1,8 +1,5 @@
-
 export type CourseType = "Video" | "Podcast" | "Text";
 export type ItemKind   = "video" | "audio" | "text";
-
-
 
 export type Course = {
   id: string;
@@ -13,12 +10,21 @@ export type Course = {
   description?: string;
 };
 
-
+export type TranscriptCue = { start: number; end: number; text: string };
 
 export type LessonItem = {
   id: string;
   title: string;
-  kind: ItemKind;  
-  fileUri: string;
+  kind: ItemKind;
+
+
+  fileUri?: string;          
   fileName?: string | null;
+
+
+  transcriptVttUri?: string;   
+  transcriptText?: string;    
+  cues?: TranscriptCue[];      
+
+  contentMd?: string;         
 };

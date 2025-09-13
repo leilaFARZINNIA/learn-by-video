@@ -1,4 +1,6 @@
 import { about } from "./about/colors";
+import { admin } from "./admin/colors";
+import { contact } from "./contact/colors";
 import { courselist } from "./courselist/colors";
 import { dashboardColors } from "./dashboard/colors";
 import { dashboarddetail } from "./dashboard/detail/colors";
@@ -24,6 +26,10 @@ export const lightColors = {
   podcast: podcast.light,
   text: podcast.light,
   settings: settings.light,
+  contact: contact.light,
+  admin: admin.light,
+  
+
 
  
   
@@ -46,6 +52,8 @@ export const darkColors = {
   podcast: podcast.dark,
   text: podcast.dark,
   settings: settings.dark,
+  contact: contact.dark,
+  admin: admin.dark,
 
      
   };

@@ -58,11 +58,25 @@ export default function ConfirmDeleteModal({
             />
           )}
 
-          <View style={{ height: 10 }} />
-          <View style={{ flexDirection: "row", justifyContent: "flex-end", gap: 10 }}>
-            <GhostBtn title="Cancel" onPress={onClose} />
-            <DangerBtn title={deleting ? "Deleting..." : "Delete"} onPress={onConfirm} disabled={!canDelete || !!deleting || (needPassword && !delPass)} />
-          </View>
+            
+              <View style={{ height: 10 }} />
+
+              <View style={styles.rowBtns}>
+                <View style={[styles.btnCol, { marginRight: 10 }]}>
+                  <GhostBtn title="Cancel" onPress={onClose} /* block=default:true */ />
+                </View>
+
+                <View style={styles.btnCol}>
+                  <DangerBtn
+                    title={deleting ? "Deleting..." : "Delete"}
+                    onPress={onConfirm}
+                    disabled={!canDelete || !!deleting || (needPassword && !delPass)}
+                    /* block=default:true */
+                  />
+                </View>
+              </View>
+
+
         </View>
       </View>
     </Modal>
@@ -76,6 +90,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     padding: 20,
+  },
+  rowBtns: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end", 
+  },
+  btnCol: {
+    flex: 1, 
   },
   card: { width: "100%", maxWidth: 440, borderRadius: 16, padding: 16 },
   title: { fontSize: 18, fontWeight: "900", marginBottom: 6 },

@@ -1,3 +1,4 @@
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { FontAwesome5 } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
@@ -6,6 +7,7 @@ import { useAuth } from "../../auth/auth-context";
 import { useTheme } from '../../context/ThemeContext';
 import { HISTORY_ITEMS } from './menuData';
 import styles from './styles';
+
 
 
 type MenuContentProps = {
@@ -31,6 +33,7 @@ export default function MenuContent({
   const { colors } = useTheme();
   const menu = (colors as any).menu;
   const { user, logout } = useAuth();
+  const isAdmin = useIsAdmin(); // true | false | null
   console.log("🔄 MenuContent user:", user);
 
 
@@ -38,6 +41,20 @@ let filteredItems = items;
 
 if (user) {
   filteredItems = items.filter(i => i.route !== "/login");
+
+if (isAdmin === true) {
+  filteredItems = filteredItems.map(i =>
+    i.route === "/dashboard"
+      ? {
+          ...i,
+          label: "Admin dashboard",
+          route: "/admin",
+          icon: <FontAwesome5 name="shield-alt" size={24} />,
+        }
+      : i
+  );
+}
+
   filteredItems.push({
     icon: <FontAwesome5 name="sign-out-alt" size={24} />,
     label: "Logout",

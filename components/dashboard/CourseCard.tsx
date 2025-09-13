@@ -1,10 +1,29 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import React from "react";
+import React, { useCallback, useRef } from "react";
 import { ColorValue, Pressable, StyleSheet, Switch, Text, View } from "react-native";
 import { useGradients } from "../../components/dashboard/gradients";
 import { useTheme } from "../../context/ThemeContext";
 import type { Course } from "./types";
+
+
+function useBlockablePress(onPress?: () => void) {
+  const blockedRef = useRef(false);
+
+  const blockNextPress = useCallback(() => {
+    blockedRef.current = true;
+  }, []);
+
+  const handlePress = useCallback(() => {
+    if (blockedRef.current) {
+      blockedRef.current = false; 
+      return;
+    }
+    onPress?.();
+  }, [onPress]);
+
+  return { handlePress, blockNextPress };
+}
 
 type Props = {
   course: Course;
@@ -13,38 +32,43 @@ type Props = {
 };
 
 export default function CourseCard({ course, onToggle, onDelete }: Props) {
-   const { gradientsByType, pickRandomGradient } = useGradients();
-   const gradient = course.gradient || gradientsByType[course.type];
+  const { gradientsByType } = useGradients();
+  const gradient = course.gradient || gradientsByType[course.type];
   const statusLabel = course.active ? "Published" : "Unpublished";
   const actionLabel = course.active ? "Unpublish" : "Publish";
 
   const { colors: themeColors } = useTheme();
-  const dashboard = (themeColors as any).dashboardColors;;
+  const dashboard = (themeColors as any).dashboardColors;
 
-  const goDetail = () => {
+  const goDetail = () =>
     router.push({
       pathname: "/dashboard/[id]",
-      params: {
-        id: course.id,
-        name: course.name,
-        type: course.type,
-      },
+      params: { id: course.id, name: course.name, type: course.type },
     });
-  };
+
+ 
+  const { handlePress, blockNextPress } = useBlockablePress(goDetail);
 
   return (
-    <Pressable onPress={goDetail} style={{ flex: 1 }}>
+    <Pressable onPress={handlePress} style={{ flex: 1 }}>
       <LinearGradient
         colors={gradient as [ColorValue, ColorValue]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={[styles.card, { shadowColor: dashboard.card.shadow }]}
       >
-        <Text style={[styles.cardTitle, { color: dashboard.card.title }]}>
-          {course.name}
-        </Text>
+        <Text style={[styles.cardTitle, { color: dashboard.card.title }]}>{course.name}</Text>
 
-        <Pressable onPress={onDelete} style={[styles.deleteBtn, { backgroundColor: dashboard.card.deleteBg }]} hitSlop={10}>
+        
+        <Pressable
+          style={[styles.deleteBtn, { backgroundColor: dashboard.card.deleteBg }]}
+          hitSlop={10}
+          onPress={() => {
+            blockNextPress();
+            onDelete();
+          }}
+          onPressIn={blockNextPress}
+        >
           <Text style={[styles.deleteText, { color: dashboard.card.deleteText }]}>Delete</Text>
         </Pressable>
 
@@ -63,7 +87,30 @@ export default function CourseCard({ course, onToggle, onDelete }: Props) {
             <Text style={[styles.cardAction, { color: dashboard.card.action }]}>{actionLabel}</Text>
             <Text style={[styles.cardStatus, { color: dashboard.card.status }]}>{statusLabel}</Text>
           </View>
-          <Switch value={course.active} onValueChange={onToggle} />
+
+        
+          <View
+            onStartShouldSetResponder={() => {
+              blockNextPress();
+              return true;
+            }}
+            onMoveShouldSetResponder={() => true}
+            onResponderTerminationRequest={() => false}
+          >
+            <Switch
+              value={course.active}
+              onValueChange={() => {
+                blockNextPress();
+                onToggle();
+              }}
+             
+              // @ts-ignore
+              onClick={(e) => {
+                if (e?.stopPropagation) e.stopPropagation();
+                blockNextPress();
+              }}
+            />
+          </View>
         </View>
       </LinearGradient>
     </Pressable>
