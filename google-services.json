@@ -1,0 +1,62 @@
+{
+  "project_info": {
+    "project_number": "44158199453",
+    "project_id": "learn-by-video-7a6b6",
+    "storage_bucket": "learn-by-video-7a6b6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:44158199453:android:7d54379dcd2037faa95674",
+        "android_client_info": {
+          "package_name": "com.learnbyvideo.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "44158199453-5ho83eaq954pjivtht5akoo622i34mu4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.learnbyvideo.app",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "44158199453-gnop6vfjb19o50pq4rkjnhs6862aijl9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.learnbyvideo.app",
+            "certificate_hash": "5acddb2613c5eab61564066355bc630e58129b5e"
+          }
+        },
+        {
+          "client_id": "44158199453-hdrtn48qhjlmd8od7hh65fbkjhpv2dck.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBplPmXd9tve0p6huGNdQ6SaWCh-2IyCDw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "44158199453-hdrtn48qhjlmd8od7hh65fbkjhpv2dck.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "44158199453-afiom83p91i8uaoofvqkc0s7fdv0e3bf.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.learnbyvideo.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
