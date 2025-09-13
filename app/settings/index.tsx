@@ -59,7 +59,12 @@ export default function SettingsScreen() {
             />
           </SectionCard>
 
+     
+         
+
+
     
+
         </View>
       </View>
     </ScrollView>

@@ -1,17 +1,26 @@
 import type { CourseType } from "../types";
+export type MediaCourseType = Exclude<CourseType, "Text">;
 
-export const ALLOWED = {
-  Video:   { exts: ["mp4","mov","m4v","webm","mkv"], mimes: ["video/mp4","video/quicktime","video/x-m4v","video/webm","video/x-matroska"] },
-  Podcast: { exts: ["mp3","m4a","aac","wav","ogg"],   mimes: ["audio/mpeg","audio/mp4","audio/aac","audio/wav","audio/ogg"] },
-  Text:    { exts: ["txt","pdf","doc","docx","rtf","md"],
-             mimes:["text/plain","application/pdf","application/msword","application/vnd.openxmlformats-officedocument.wordprocessingml.document","application/rtf","text/markdown"] },
+export const ALLOWED: Record<MediaCourseType, { exts: string[]; mimes: string[] }> = {
+  Video:   { exts:["mp4","mov","m4v","webm","mkv"], mimes:["video/mp4","video/quicktime","video/x-m4v","video/webm","video/x-matroska"] },
+  Podcast: { exts:["mp3","m4a","aac","wav","ogg"],   mimes:["audio/mpeg","audio/mp4","audio/aac","audio/wav","audio/ogg"] },
+} as const;
+
+export const ALLOWED_TRANSCRIPT = {
+  exts:["vtt","srt","txt"],
+  mimes:["text/vtt","application/x-subrip","text/plain"],
 } as const;
 
 export const MAX_SIZE_BYTES = 200 * 1024 * 1024;
 export const getExt = (n?: string|null) => (n?.split(".").pop() || "").toLowerCase();
 
+
+export function isMediaType(t: CourseType): t is MediaCourseType {
+  return t === "Video" || t === "Podcast";
+}
+
 export function isAllowed(
-  courseType: CourseType,
+  courseType: MediaCourseType,
   file: { name?: string | null; mimeType?: string | null; size?: number | null }
 ){
   const allow = ALLOWED[courseType];
