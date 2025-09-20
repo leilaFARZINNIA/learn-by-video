@@ -1,62 +1,76 @@
 
 export { default as AddCourseModal } from "../../components/dashboard/AddCourseModal";
 export { default as DeleteConfirmModal } from "../../components/dashboard/DeleteConfirmModal";
-
 export * from "../../components/dashboard/types";
+import { useEffect } from "react";
 import { default as CourseCard } from "../../components/dashboard/CourseCard";
 
+import { useBreakpoint } from "@/hooks/useBreakpoint";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useState } from "react";
 import { FlatList, Pressable, SafeAreaView, StatusBar, StyleSheet, Text, View } from "react-native";
+import type { ApiCourse } from "../../api/course-api";
+import { createCourse as apiCreateCourse, deleteCourse as apiDeleteCourse, fetchCourses as apiFetchCourses } from "../../api/course-api";
 import AddCourseModal from "../../components/dashboard/AddCourseModal";
 import DeleteConfirmModal from "../../components/dashboard/DeleteConfirmModal";
 import { useGradients } from "../../components/dashboard/gradients";
 import { Course, CourseType } from "../../components/dashboard/types";
 import { useTheme } from "../../context/ThemeContext";
 
- 
-
-
-
 
 export default function DashboardScreen() {
+
+  const toUIType = (t: ApiCourse["course_type"]) => (t[0].toUpperCase() + t.slice(1)) as CourseType;
+const apiToUI = (c: ApiCourse): Course => ({
+  id: c.course_id,
+  name: c.course_title,
+  description: c.course_description ?? undefined,
+  type: toUIType(c.course_type),
+  active: true,
+  gradient: pickRandomGradient(),
+});
 
   const { gradientsByType, pickRandomGradient } = useGradients();
   const { colors } = useTheme();
   const dashboard = (colors as any).dashboardColors;
-  
   const [courses, setCourses] = useState<Course[]>([]);
   type AddCoursePayload = /*unresolved*/ any
-
   // Add modal
   const [addOpen, setAddOpen] = useState(false);
   // Delete modal
   const [delOpen, setDelOpen] = useState(false);
   const [delId, setDelId] = useState<string | null>(null);
-
   const countOf = (t: CourseType) => courses.filter((c) => c.type === t).length;
-
   const openAdd = () => setAddOpen(true);
+  const { isDesktop } = useBreakpoint();
+  const columns = isDesktop ? 2 : 1;
 
-  const handleAdd = ({ name, type, active, description }: AddCoursePayload) => {
+  useEffect(() => {
+    (async () => {
+      try {
+        const rows = await apiFetchCourses();
+        setCourses(rows.map(apiToUI));
+      } catch (e: any) {
+        console.warn("load courses failed:", e?.message);
+      }
+    })();
+  }, []);
+
+  const handleAdd = async ({ name, type, active, description }: AddCoursePayload) => {
     const n = countOf(type) + 1;
-    const finalName = name.trim() || `${type} ${n}`;
-  
-    setCourses(prev => [
-      ...prev,
-      {
-        id: `${type.toLowerCase()}-${Date.now()}-${Math.round(Math.random() * 10000)}`,
-        type,
-        name: finalName,
-        active,
-        gradient: pickRandomGradient(),
-        description,
-      },
-    ]);
-    setAddOpen(false);
+    const finalName = (name ?? "").trim() || `${type} ${n}`;
+    try {
+      const created = await apiCreateCourse({ title: finalName, description, type });
+      const ui = apiToUI(created);
+      ui.active = active;
+      ui.gradient = pickRandomGradient();
+      setCourses(prev => [ui, ...prev]);
+      setAddOpen(false);
+    } catch (e: any) {
+      console.warn("create failed:", e?.message);
+    }
   };
   
-
   const toggleCourse = (id: string) =>
     setCourses((prev) => prev.map((c) => (c.id === id ? { ...c, active: !c.active } : c)));
 
@@ -67,10 +81,20 @@ export default function DashboardScreen() {
 
   const confirmDelete = () => {
     if (!delId) return;
-    setCourses((prev) => prev.filter((c) => c.id !== delId));
-    setDelId(null);
-    setDelOpen(false);
+  
+    void (async () => {
+      try {
+        await apiDeleteCourse(delId);                      
+        setCourses(prev => prev.filter(c => c.id !== delId)); 
+      } catch (e: any) {
+        console.warn("delete failed:", e?.message);
+      } finally {
+        setDelId(null);
+        setDelOpen(false); 
+      }
+    })();
   };
+  
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: dashboard.screenBg }}>
@@ -89,14 +113,19 @@ export default function DashboardScreen() {
       </View>
 
       <FlatList
+        key={`cols-${columns}`}                
         data={courses}
         keyExtractor={(item) => item.id}
-        numColumns={2}
+        numColumns={columns}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 24 }}
-        columnWrapperStyle={{ gap: 16 }}
+        columnWrapperStyle={columns > 1 ? { gap: 16 } : undefined} 
         ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
         renderItem={({ item }) => (
-          <CourseCard course={item} onToggle={() => toggleCourse(item.id)} onDelete={() => askDelete(item.id)} />
+          <CourseCard
+            course={item}
+            onToggle={() => toggleCourse(item.id)}
+            onDelete={() => askDelete(item.id)}
+          />
         )}
       />
 

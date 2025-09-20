@@ -1,6 +1,7 @@
 
 import { HIGHLIGHT_WORDS } from '@/constants/video-player/transcript-highlight';
 import { useAutoStopMedia } from '@/utils/mediaLifecycle';
+import { resolvePlayableUrl } from "@/utils/resolveMediaUrl";
 import { Video } from 'expo-av';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
@@ -106,7 +107,7 @@ export default function VideoTranscriptScreen() {
         {/* Videoplayer-Komponente */}
         <VideoPlayer
           videoRef={videoRef}
-          url={media.media_url}
+          url={resolvePlayableUrl(media.media_url)}
           isLoading={isLoading}
           handleLoaded={handleLoaded}
           handlePlaybackStatusUpdate={handlePlaybackStatusUpdate}

@@ -4,47 +4,88 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import Constants from "expo-constants";
 import { Platform } from "react-native";
 
-// ---- Base URL resolution ----
-const envUrl = process.env.EXPO_PUBLIC_API_URL;
+// ========= Base URL Resolution =========
 
-function resolveExpoHostFallback(): string | null {
-  const hostUri =
-    (Constants as any)?.expoConfig?.hostUri ??
-    (Constants as any)?.manifest2?.extra?.expoClient?.hostUri;
-  if (hostUri) {
-    const host = hostUri.split(":")[0];
-    if (/^\d+\.\d+\.\d+\.\d+$/.test(host)) {
-      return `http://${host}:8080`;
+const ENV_API = (process.env.EXPO_PUBLIC_API_URL ?? "").trim();
+
+const ENV_LAN = (process.env.EXPO_PUBLIC_LAN_BASE_URL ?? "http://172.20.10.4:8080").trim();
+
+function inferExpoLanBase(): string | null {
+  try {
+    const c: any = Constants as any;
+    const hostUri: string | undefined =
+      c?.expoConfig?.hostUri ||
+      c?.manifest2?.extra?.expoClient?.hostUri ||
+      c?.manifest?.hostUri ||
+      c?.debuggerHost; // "192.168.x.x:19000"
+
+    if (hostUri) {
+      const host = hostUri.split(":")[0];
+      if (/^\d+\.\d+\.\d+\.\d+$/.test(host)) {
+        return `http://${host}:8080`;
+      }
     }
-  }
+  } catch {}
   return null;
 }
 
-function getBaseUrl() {
-  const raw = (envUrl ?? "").trim();
+function normalizeBase(u: string) {
+  if (!u) return "";
+  return /^https?:\/\//i.test(u) ? u : `http://${u}`;
+}
 
+function swapBase(inputUrl: string, newBase: string): string {
+  const base = new URL(normalizeBase(newBase));
+  try {
+    const u = new URL(inputUrl);
+    u.protocol = base.protocol;
+    u.host = base.host; // hostname + :port
+    return u.toString();
+  } catch {
+    // fallback
+    return inputUrl.replace(/^https?:\/\/[^/]+/i, base.origin);
+  }
+}
+
+// localhost → LAN mapping for native
+function mapLocalhostForNative(url: string): string {
+  if (!/^https?:\/\//i.test(url)) return url;
+  if (!/(localhost|127\.0\.0\.1)/i.test(url)) return url;
+
+  if (Platform.OS === "android") {
+    // Android Emulator
+    return url.replace(/\/\/(localhost|127\.0\.0\.1)/i, "//10.0.2.2");
+  }
+
+  if (Platform.OS === "ios") {
+    const lan = ENV_LAN || inferExpoLanBase() || "http://172.20.10.4:8080";
+    return swapBase(url, lan);
+  }
+
+  return url;
+}
+
+function getBaseUrl() {
   
-  if (raw) {
-    if (
-      Platform.OS === "android" &&
-      /^(https?:\/\/)(localhost|127\.0\.0\.1)(:\d+)?/i.test(raw)
-    ) {
-      return raw
-        .replace("localhost", "10.0.2.2")
-        .replace("127.0.0.1", "10.0.2.2");
-    }
-    return raw;
+  if (Platform.OS === "web") {
+    return ENV_API || "http://localhost:8080";
   }
 
 
-  if (Platform.OS === "android") return "http://10.0.2.2:8080"; 
-  return resolveExpoHostFallback() ?? "http://localhost:8080";
-}
+  if (ENV_API) {
+    return mapLocalhostForNative(ENV_API);
+  }
 
+  
+  if (Platform.OS === "android") return "http://10.0.2.2:8080";
+
+  return ENV_LAN || inferExpoLanBase() || "http://localhost:8080";
+}
 
 export const BASE_URL = getBaseUrl();
 
-// ---- Axios instance ----
+// ========= Axios Instance =========
+
 const axiosClient = axios.create({
   baseURL: BASE_URL,
   withCredentials: false,
@@ -56,10 +97,12 @@ const axiosClient = axios.create({
 });
 
 if (__DEV__) {
-  console.log("[axios] API_URL =", envUrl, "BASE_URL =", BASE_URL);
+  console.log("[axios] API_URL =", ENV_API, "LAN_BASE =", ENV_LAN, "BASE_URL =", BASE_URL);
 }
 
-// ---- Request interceptor: attach Firebase ID token ----
+// ========= Interceptors =========
+
+// Request: attach token + dev logs
 axiosClient.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
     const token = await getAuthToken().catch(() => null);
@@ -95,7 +138,7 @@ axiosClient.interceptors.request.use(
   }
 );
 
-// ---- Response interceptor: single refresh on 401 ----
+// Response: simple retry on 401
 axiosClient.interceptors.response.use(
   (response) => {
     if (__DEV__) {

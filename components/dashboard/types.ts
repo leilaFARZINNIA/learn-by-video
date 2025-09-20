@@ -16,12 +16,8 @@ export type LessonItem = {
   id: string;
   title: string;
   kind: ItemKind;
-
-
   fileUri?: string;          
   fileName?: string | null;
-
-
   transcriptVttUri?: string;   
   transcriptText?: string;    
   cues?: TranscriptCue[];      

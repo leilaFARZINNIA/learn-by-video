@@ -25,7 +25,13 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.learnbyvideo.app",
-      "googleServicesFile": "./GoogleService-Info.plist"
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      }
+      
     },
 
 

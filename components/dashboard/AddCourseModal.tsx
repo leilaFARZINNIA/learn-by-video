@@ -14,18 +14,19 @@ import {
 import { useTheme } from "../../context/ThemeContext";
 import type { CourseType } from "./types";
 
-type AddCoursePayload = {
+export type AddCoursePayload = {
   name: string;
   type: CourseType;
   active: boolean;
-  description?: String;
+  description?: string; 
 };
 
 type Props = {
   visible: boolean;
   onClose: () => void;
-  onSubmit: (payload: AddCoursePayload) => void;
+  onSubmit: (payload: AddCoursePayload) => void | Promise<void>; // ⬅️ اجازه به async
 };
+
 
 export default function AddCourseModal({ visible, onClose, onSubmit }: Props) {
   const [name, setName] = useState("");
