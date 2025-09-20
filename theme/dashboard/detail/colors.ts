@@ -54,7 +54,13 @@ export const dashboarddetail = {
         deleteText: "#991B1B",   
         deleteIcon: "#DC2626",   
         deleteBorder: "#FCA5A5",
+
+
+        hasTranscriptBg:"#DBEAFE",
+        hasTranscriptText:"#1E3A8A",
         },
+
+
       
        
         fab: {
@@ -129,6 +135,10 @@ export const dashboarddetail = {
         deleteText: "#FCA5A5",
         deleteIcon: "#F87171",
         deleteBorder: "#4A1518",
+
+
+        hasTranscriptBg:"#1F2A44",
+        hasTranscriptText:"#93C5FD",
         },
       
         fab: {

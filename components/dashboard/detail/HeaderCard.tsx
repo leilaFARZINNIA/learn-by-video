@@ -1,34 +1,44 @@
+// src/components/dashboard/detail/HeaderCard.tsx
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Text, View } from "react-native";
 import { useTheme } from "../../../context/ThemeContext";
+import { useBreakpoint } from "../../../hooks/useBreakpoint";
+import { ellipsizeSmart } from "../../../utils/ellipsize";
 import type { CourseType } from "../types";
 import { useDashboardStyles } from "./styles";
 
-export default function HeaderCard({
-  name,
-  id,
-  type,
-}: {
+type Props = {
   name: string;
   id: string;
   type: CourseType;
-}) {
-  const icon =
-    type === "Video"
-      ? "movie-open-play"
-      : type === "Podcast"
-      ? "podcast"
-      : "file-document-outline";
+};
+
+export default function HeaderCard({ name, id, type }: Props) {
+  const iconName: React.ComponentProps<typeof MaterialCommunityIcons>["name"] =
+    type === "Video" ? "movie-open-play"
+    : type === "Podcast" ? "podcast"
+    : "file-document-outline";
 
   const { colors } = useTheme();
   const headerColors = (colors as any).dashboarddetail.header;
   const s = useDashboardStyles();
-
+  const { isPhone, isDesktop } = useBreakpoint();
 
   const gradient = headerColors.gradientsByType[type];
   const iconColor = headerColors.iconColor;
+
+ 
+  const titleShort = ellipsizeSmart(name, {
+    maxWords: 2,                    
+    maxChars: isDesktop ? 36 : 20,   
+  });
+
+  const idShort = ellipsizeSmart(id, {
+    maxWords: 3,                     
+    maxChars: isDesktop ? 28 : 18,
+  });
 
   return (
     <LinearGradient
@@ -38,11 +48,26 @@ export default function HeaderCard({
       style={s.headerCard}
     >
       <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-        <MaterialCommunityIcons name={icon as any} size={28} color={iconColor} />
-        <View>
-          <Text style={s.headerTitle}>{name}</Text>
-          <Text style={s.headerSub}>
-            Type: {type} • ID: {id}
+        <MaterialCommunityIcons name={iconName} size={28} color={iconColor} />
+       
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <Text
+            style={[s.headerTitle, { fontSize: isPhone ? 18 : 20 }]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            accessibilityLabel={name}
+          >
+            {titleShort}
+          </Text>
+
+          <Text
+            style={[s.headerSub, { fontSize: isPhone ? 12 : 13 }]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            accessibilityLabel={`Type: ${type}`}
+          >
+           
+            Type: {type}  
           </Text>
         </View>
       </View>
