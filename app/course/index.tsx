@@ -22,8 +22,12 @@ export default function CourseListScreen() {
 
   useEffect(() => {
     setLoading(true);
-    fetchCoursesByType(type).then(setCourses).finally(() => setLoading(false));
+    fetchCoursesByType(type, { public: true }) 
+      .then(setCourses)
+      .catch(e => console.warn("fetchCoursesByType failed:", e?.message))
+      .finally(() => setLoading(false));
   }, [type]);
+  
 
   if (loading) return <View style={{ flex:1, alignItems:"center", justifyContent:"center" }}><Text>Loading…</Text></View>;
 

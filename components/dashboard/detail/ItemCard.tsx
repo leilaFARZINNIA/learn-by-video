@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
-import { Platform, Text, TouchableOpacity, View } from "react-native";
+import { Platform, Text, TouchableOpacity, View, type TextStyle } from "react-native";
 import { useTheme } from "../../../context/ThemeContext";
 import { useBreakpoint } from "../../../hooks/useBreakpoint";
 import { ellipsizeSmart } from "../../../utils/ellipsize";
@@ -18,51 +18,42 @@ export default function ItemCard({ item, onEdit, onDelete }: Props) {
   const itemColors = (colors as any).dashboarddetail.itemCard;
   const s = useDashboardStyles();
   const { isDesktop, isPhone } = useBreakpoint();
-
   const iconName: React.ComponentProps<typeof MaterialCommunityIcons>["name"] =
     item.kind === "video" ? "movie-open"
     : item.kind === "audio" ? "music-note"
     : "file-document-outline";
 
   const kindLabel = item.kind === "video" ? "VIDEO" : item.kind === "audio" ? "AUDIO" : "TEXT";
-
-  const hasTranscript =
-    item.kind !== "text" && (!!item.transcriptText || !!item.transcriptVttUri);
-
-  const textPreview =
-    item.kind === "text" && item.contentMd ? item.contentMd.replace(/\s+/g, " ").trim() : "";
-
-
-  const titleShort = ellipsizeSmart(item.title, {
-    maxWords: 2,
-    maxChars: isDesktop ? 28 : 16,
-  });
-
+  const hasTranscript = item.kind !== "text" && (!!item.transcriptText || !!item.transcriptVttUri);
+  const textPreview = item.kind === "text" && item.contentMd ? item.contentMd.replace(/\s+/g, " ").trim() : "";
+  const titleText = (item.title ?? "").trim();
   const fileNameShort = ellipsizeSmart(item.fileName ?? "File selected", {
     maxWords: 2,
     maxChars: isDesktop ? 24 : 14,
   });
-
   const previewShort = ellipsizeSmart(textPreview, {
     maxWords: isDesktop ? 8 : 6,
     maxChars: isDesktop ? 60 : 36,
   });
+  const webBreakWord: TextStyle =
+    Platform.OS === "web" ? ({ wordBreak: "break-word" } as unknown as TextStyle) : {};
 
   return (
     <View style={[s.card, { alignItems: "center" }]}>
-      
+    
       <View style={{ flex: 1, minWidth: 0 }}>
-       
+      
         <Text
           style={[
             s.cardTitle,
             { fontSize: isPhone ? 15 : 16, lineHeight: isPhone ? 20 : 22 },
+            webBreakWord, 
           ]}
-          numberOfLines={1}
+          numberOfLines={isPhone ? 1 : 2}
           ellipsizeMode="tail"
-          accessibilityLabel={item.title}
+          accessibilityLabel={titleText}
         >
-          {titleShort}
+          {titleText}
         </Text>
 
         {/* Meta row */}
@@ -83,13 +74,7 @@ export default function ItemCard({ item, onEdit, onDelete }: Props) {
           <Text style={[s.cardMeta, { fontSize: 12 }]}>{kindLabel}</Text>
 
           {item.kind !== "text" && (
-            <View
-              style={{
-                flexShrink: 1,
-                minWidth: 0,
-                maxWidth: isDesktop ? "60%" : "45%",
-              }}
-            >
+            <View style={{ flexShrink: 1, minWidth: 0, maxWidth: isDesktop ? "60%" : "45%" }}>
               <Text
                 style={[s.cardMeta, { fontSize: 12 }]}
                 numberOfLines={1}
@@ -109,9 +94,7 @@ export default function ItemCard({ item, onEdit, onDelete }: Props) {
                 paddingVertical: Platform.OS === "web" ? 2 : 3,
                 borderRadius: 8,
                 backgroundColor: itemColors.hasTranscriptBg,
-            
-                flexShrink: 0, 
-
+                flexShrink: 0,
               }}
             >
               <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
@@ -120,12 +103,7 @@ export default function ItemCard({ item, onEdit, onDelete }: Props) {
                   size={14}
                   color={itemColors.hasTranscriptText}
                 />
-                <Text
-                  style={{
-                    fontSize: 11,
-                    color: itemColors.hasTranscriptText,
-                  }}
-                >
+                <Text style={{ fontSize: 11, color: itemColors.hasTranscriptText }}>
                   Transcript
                 </Text>
               </View>
@@ -133,7 +111,6 @@ export default function ItemCard({ item, onEdit, onDelete }: Props) {
           )}
         </View>
 
-       
         {item.kind === "text" && !!textPreview && (
           <Text
             style={[s.cardMeta, { marginTop: 4, fontSize: 12 }]}
@@ -146,17 +123,16 @@ export default function ItemCard({ item, onEdit, onDelete }: Props) {
         )}
       </View>
 
-     
+      
       <View
         style={{
           flexDirection: "row",
           gap: isPhone ? 6 : 8,
           flexShrink: 0,
           alignItems: "center",
-          alignSelf: "flex-start", 
+          alignSelf: "flex-start",
         }}
       >
-        
         {isPhone ? (
           <>
             <TouchableOpacity onPress={() => onEdit(item)} style={s.editBtn}>

@@ -2,7 +2,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { Text, View } from "react-native";
+import { Platform, Text, View, type TextStyle } from "react-native";
 import { useTheme } from "../../../context/ThemeContext";
 import { useBreakpoint } from "../../../hooks/useBreakpoint";
 import { ellipsizeSmart } from "../../../utils/ellipsize";
@@ -29,16 +29,16 @@ export default function HeaderCard({ name, id, type }: Props) {
   const gradient = headerColors.gradientsByType[type];
   const iconColor = headerColors.iconColor;
 
- 
-  const titleShort = ellipsizeSmart(name, {
-    maxWords: 2,                    
-    maxChars: isDesktop ? 36 : 20,   
+  
+  const titleText = (name ?? "").trim();
+  const idShort = ellipsizeSmart(id, {
+    maxWords: 3,
+    maxChars: isDesktop ? 36 : 22,
   });
 
-  const idShort = ellipsizeSmart(id, {
-    maxWords: 3,                     
-    maxChars: isDesktop ? 28 : 18,
-  });
+  
+  const webBreakWord: TextStyle =
+    Platform.OS === "web" ? ({ wordBreak: "break-word" } as unknown as TextStyle) : {};
 
   return (
     <LinearGradient
@@ -49,25 +49,25 @@ export default function HeaderCard({ name, id, type }: Props) {
     >
       <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
         <MaterialCommunityIcons name={iconName} size={28} color={iconColor} />
-       
+
         <View style={{ flex: 1, minWidth: 0 }}>
+          
           <Text
-            style={[s.headerTitle, { fontSize: isPhone ? 18 : 20 }]}
-            numberOfLines={1}
+            style={[s.headerTitle, { fontSize: isPhone ? 18 : 20 }, webBreakWord]}
+            numberOfLines={isPhone ? 1 : 2}
             ellipsizeMode="tail"
-            accessibilityLabel={name}
+            accessibilityLabel={titleText}
           >
-            {titleShort}
+            {titleText}
           </Text>
 
           <Text
             style={[s.headerSub, { fontSize: isPhone ? 12 : 13 }]}
             numberOfLines={1}
             ellipsizeMode="tail"
-            accessibilityLabel={`Type: ${type}`}
+            accessibilityLabel={`Type: ${type} • ID: ${id}`}
           >
-           
-            Type: {type}  
+            Type: {type}{"  "}
           </Text>
         </View>
       </View>

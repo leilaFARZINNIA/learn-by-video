@@ -1,11 +1,12 @@
 // app/login/index.tsx
 import { router } from "expo-router";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useAuth } from "../../auth/auth-context";
 import { useTheme } from "../../context/ThemeContext";
 import { useResponsive } from "../../theme/home/responsive";
 
+import { getMe } from "@/api/auth-api";
 import EmailAuthForm from "../../components/login/EmailAuthForm";
 import GoogleButton from "../../components/login/GoogleButton";
 import Hero from "../../components/login/Hero";
@@ -23,18 +24,26 @@ export default function LoginPage() {
   const [providerTab, setProviderTab] = useState<ProviderTab>("google");
   const [googleBusy, setGoogleBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const didRedirectRef = useRef(false);
 
   useEffect(() => {
-    if (!loading && user) router.replace("/");
+    if (!loading && user && !didRedirectRef.current) {
+      didRedirectRef.current = true;
+    
+      getMe().catch(() => {});
+      router.replace("/");
+    }
   }, [loading, user]);
 
   const onGoogle = async () => {
     if (googleBusy) return;
     setErr(null);
+    setGoogleBusy(true);
     try {
-      setGoogleBusy(true);
-      await loginWithGoogle();
-    } catch {
+      await loginWithGoogle(); 
+      await getMe();           
+      router.replace("/");
+    } catch (e) {
       setErr("Google sign-in was cancelled or failed.");
     } finally {
       setGoogleBusy(false);
@@ -42,7 +51,9 @@ export default function LoginPage() {
   };
 
   const onEmailSuccess = async () => {
-    await refreshUser();
+  
+    await refreshUser(); 
+    await getMe();      
     router.replace("/");
   };
 
