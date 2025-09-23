@@ -4,6 +4,7 @@ import { router } from "expo-router";
 import React, { useCallback, useRef } from "react";
 import {
   ColorValue,
+  Platform,
   Pressable,
   StyleSheet,
   Switch,
@@ -43,8 +44,12 @@ export default function CourseCard({ course, onToggle, onDelete }: Props) {
   const goDetail = () =>
     router.push({ pathname: "/dashboard/[id]", params: { id: course.id, name: course.name, type: course.type } });
   const { handlePress, blockNextPress } = useBlockablePress(goDetail);
-  const titleShort = ellipsizeSmart(course.name, { maxWords: 2, maxChars: isDesktop ? 34 : 20 });
-  const descShort  = ellipsizeSmart(course.description || "", { maxWords: isDesktop ? 16 : 10, maxChars: isDesktop ? 120 : 70 });
+  const titleText = (course.name ?? "").trim(); 
+  const descShort = ellipsizeSmart(course.description ?? "", {
+    maxWords: isDesktop ? 20 : 12,
+    maxChars: isDesktop ? 160 : 90,
+  });
+  
   const published = course.active;
 
   return (
@@ -68,13 +73,24 @@ export default function CourseCard({ course, onToggle, onDelete }: Props) {
   <>
     <View style={styles.headerRow}>
       <View style={{ flex: 1, minWidth: 0 }}>
-        <Text
-          style={[styles.cardTitle, { color: dashboard.card.title, fontSize: 16, lineHeight: 20 }]}
+      <Text
+  style={[
+    styles.cardTitle,
+    {
+      color: dashboard.card.title,
+      fontSize: 16,
+      lineHeight: 20,
+      paddingRight: 56, 
+      ...(Platform.OS === "web" ? ({ wordBreak: "break-word" } as any) : null),
+            },
+          ]}
           numberOfLines={1}
           ellipsizeMode="tail"
         >
-          {titleShort}
+          {titleText}
         </Text>
+
+
       </View>
 
       <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
@@ -118,13 +134,23 @@ export default function CourseCard({ course, onToggle, onDelete }: Props) {
           <>
             <View style={styles.headerRow}>
               <View style={{ flex: 1, minWidth: 0 }}>
-                <Text
-                  style={[styles.cardTitle, { color: dashboard.card.title, fontSize: 18, lineHeight: 24 }]}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  {titleShort}
-                </Text>
+              <Text
+  style={[
+    styles.cardTitle,
+    {
+      color: dashboard.card.title,
+      fontSize: 18,
+      lineHeight: 24,
+      paddingRight: 88, 
+                ...(Platform.OS === "web" ? ({ wordBreak: "break-word" } as any) : null),
+              },
+            ]}
+            numberOfLines={2}      // 👈 دسکتاپ دو خطه
+            ellipsizeMode="tail"
+          >
+            {titleText}
+          </Text>
+
               </View>
               <Pressable
                 style={[styles.deleteBtn, { backgroundColor: dashboard.card.deleteBg }]}
