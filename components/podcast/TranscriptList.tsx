@@ -1,4 +1,4 @@
-import { HIGHLIGHT_WORDS } from "@/constants/video-player/transcript-highlight";
+import { HIGHLIGHT_WORDS } from "@/constants/media/transcript-highlight";
 import { computeAutoScrollTarget, pickActiveIndex, shouldAutoScroll } from "@/utils/autoScroll";
 import type { TranscriptItem } from "@/utils/normalizeTranscript";
 import { Ionicons } from "@expo/vector-icons";
@@ -24,6 +24,7 @@ export default function TranscriptList({
   currentTimeSec: number; // seconds
   onSeek?: (sec: number) => void;
   maxHeight?: number;
+  highlightWords?: string[];
 }) {
   // sort defensively
   const data = useMemo(

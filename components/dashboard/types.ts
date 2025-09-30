@@ -1,5 +1,5 @@
 export type CourseType = "Video" | "Podcast" | "Text";
-export type ItemKind   = "video" | "audio" | "text";
+export type ItemKind   = "video" | "podcast" | "text";
 
 export type Course = {
   id: string;

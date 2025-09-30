@@ -5,7 +5,7 @@ export const HIGHLIGHT_WORDS = [
     'photosynthesis.', 
     'food.', 
     'Part',
-    'React'
+    'Text'
     
   ];
   

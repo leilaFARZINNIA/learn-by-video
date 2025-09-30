@@ -60,7 +60,7 @@ export default function CourseDetailScreen() {
   
   onItemPress={(item) => {
     console.log("press", item.id);
-    if (item.type === "video") router.push(`/video-player/${encodeURIComponent(String(item.id))}`);
+    if (item.type === "video") router.push(`/video/${encodeURIComponent(String(item.id))}`);
     if (item.type === "text") router.push(`/text/${encodeURIComponent(String(item.id))}`);
     if (item.type === "podcast") router.push(`/podcast/${encodeURIComponent(String(item.id))}`);
     

@@ -50,6 +50,7 @@ export async function createMediaForCourse(
     media_description: input.description ?? null,
     media_url: input.url ?? "",
     media_transcript: input.transcript ?? null,
+    
   };
   const { data } = await api.post<Media>(
     `/media/course/${encodeURIComponent(courseId)}`,
@@ -61,6 +62,7 @@ export async function createMediaForCourse(
 export async function updateMedia(
   mediaId: string,
   patch: MediaPatch
+  
 ): Promise<Media> {
   const body: Record<string, unknown> = {};
   if (patch.title !== undefined) body.media_title = patch.title;
