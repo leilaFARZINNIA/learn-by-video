@@ -1,12 +1,12 @@
 import { fetchMediaById } from "@/api/media-api";
+import RichHtml from "@/components/text/RichHtml";
 import { useTheme } from "@/context/ThemeContext";
 import { useResponsiveContainerStyle } from "@/theme/text/responsive";
 import { normalizeTranscript as normalizeTranscriptItems, TranscriptItem } from "@/utils/normalizeTranscript";
 import { Feather } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
-import { HIGHLIGHT_WORDS } from "../../constants/video-player/transcript-highlight";
+import { ActivityIndicator, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function TextScreen() {
   const { colors } = useTheme();
@@ -15,9 +15,7 @@ export default function TextScreen() {
   const [media, setMedia] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const containerStyle = useResponsiveContainerStyle({
-   
-  });
+  const containerStyle = useResponsiveContainerStyle({});
 
   useEffect(() => {
     if (!media_id) return;
@@ -29,22 +27,26 @@ export default function TextScreen() {
       .finally(() => setLoading(false));
   }, [media_id]);
 
-  const items: TranscriptItem[] = useMemo(() => {
-    return normalizeTranscriptItems(media?.media_transcript as any);
+  
+  const htmlFromTimed: string = useMemo(() => {
+    const items: TranscriptItem[] = normalizeTranscriptItems(media?.media_transcript as any);
+    if (!items?.length) return "";
+    const text = items.map(it => (it.text || []).join(" ")).filter(Boolean).join(" ");
+    return `<p>${text.replace(/\s+/g, " ").trim()}</p>`;
   }, [media?.media_transcript]);
 
-  const highlightWords = useMemo(
-    () => Array.from(new Set([...(HIGHLIGHT_WORDS || [])])).filter(Boolean),
-    []
-  );
-
-  const paragraph = useMemo(() => {
-    const joined = items
-      .map((it) => (it.text || []).join(" "))
-      .filter(Boolean)
-      .join(" ");
-    return joined.replace(/\s+/g, " ").trim();
-  }, [items]);
+  const isHtmlString = typeof media?.media_transcript === "string";
+  const html = isHtmlString ? (media?.media_transcript as string) : htmlFromTimed;
+  const htmlPatched = useMemo(() => {
+    if (!html) return "";
+   
+    const target = Platform.OS === "ios" ? "Menlo" : "monospace";
+    return html.replace(/font-family\s*:\s*monospace/gi, `font-family: ${target}`);
+  }, [html]);
+  useEffect(() => {
+    console.log("MOBILE_HTML1", (html || "").slice(0, 300));
+  }, [html]);
+  
 
   if (loading)
     return (
@@ -68,7 +70,6 @@ export default function TextScreen() {
       style={{ flex: 1, backgroundColor: textcolors.bg }}
       contentContainerStyle={{ padding: 18, paddingBottom: 40, alignItems: "center" }}
     >
-
       <View style={containerStyle}>
         {/* Header card */}
         <View style={[styles.card, { backgroundColor: textcolors.card, shadowColor: textcolors.shadow }]}>
@@ -98,13 +99,26 @@ export default function TextScreen() {
             </View>
           </View>
         </View>
-      
+
+        {/* Content card */}
         <View style={[styles.card, { backgroundColor: textcolors.card, shadowColor: textcolors.shadow }]}>
           <Text style={{ fontSize: 18, fontWeight: "700", color: textcolors.text, marginBottom: 8 }}>Text</Text>
-          {paragraph ? (
-            <Text style={{ color: textcolors.text, lineHeight: 24, fontSize: 16 }}>
-              {renderWordHighlights(paragraph, highlightWords)}
-            </Text>
+
+          
+         
+
+
+           
+
+          {html?.trim() ? (
+             
+             console.log("MOBILE_HTML2", (html || "").slice(0, 300)) ,
+            <RichHtml
+             html={htmlPatched}
+              baseFontSize={16}
+              lineHeight={24}
+              bgColor={textcolors.card}
+            />
           ) : (
             <Text style={{ color: "#64748B" }}>No text available.</Text>
           )}
@@ -114,34 +128,6 @@ export default function TextScreen() {
       <View style={{ height: 24 }} />
     </ScrollView>
   );
-}
-
-function renderWordHighlights(text: string, words: string[]): React.ReactNode {
-  if (!words?.length || !text) return text;
-
-  const escaped = words.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
-  const re = new RegExp(`\\b(${escaped.join("|")})\\b`, "gi");
-
-  const parts = text.split(re);
-  return parts.map((part, i) => {
-    const isMatch = i % 2 === 1;
-    if (!isMatch) return <Text key={i}>{part}</Text>;
-    return (
-      <Text
-        key={i}
-        style={{
-          backgroundColor: "#eaf7d3",
-          color: "#257600",
-          fontWeight: "700",
-          paddingHorizontal: 6,
-          borderRadius: 6,
-          marginRight: 4,
-        }}
-      >
-        {part}
-      </Text>
-    );
-  });
 }
 
 const styles = StyleSheet.create({

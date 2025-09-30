@@ -6,6 +6,7 @@ import { ellipsizeSmart } from "../../utils/ellipsize";
 interface HeaderProps {
   vars: any;                 // { CARD_WIDTH, HEADER_FONT, ... }
   videoTitle?: string;
+  colors: any;
 }
 
 export default function Header({ vars, videoTitle }: HeaderProps) {

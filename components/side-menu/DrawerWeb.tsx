@@ -6,10 +6,11 @@ import { Animated, Dimensions, Image, Platform, Pressable, ScrollView, Text, Tou
 import { useAuth } from "../../auth/auth-context";
 import { useTheme } from '../../context/ThemeContext';
 import CustomHeader from '../CustomHeaderProps';
-import { HISTORY_ITEMS, MENU_ITEMS } from './menuData';
+import { MENU_ITEMS } from './menuData';
 import MenuItems from './MenuItems';
 import styles from './styles';
 
+import { deleteHistory, fetchHistory, type HistoryItem } from '@/api/history';
 
 const SIDEBAR_COLLAPSED = 54;
 const SIDEBAR_EXPANDED = 220;
@@ -23,19 +24,22 @@ export default function DrawerWeb({ children }: { children: React.ReactNode }) {
   const [isHovered, setIsHovered] = useState(false);
   const [hoveredMenu, setHoveredMenu] = useState<number | null>(null);
   const [selectedMenu, setSelectedMenu] = useState<number | null>(null);
-  const [selectedHistory, setSelectedHistory] = useState<number | null>(null);
-  const {  colors} = useTheme();
+
+  // History
+  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [selectedHistoryMediaId, setSelectedHistoryMediaId] = useState<string | null>(null);
+
+  const { colors } = useTheme();
   const menu = (colors as any).menu;
   const router = useRouter();
   const { user } = useAuth();
 
-const menuItemsToShow = MENU_ITEMS.filter(item => {
-  if (!user && item.route === "/dashboard") return false; 
-  if (user && item.route === "/login") return false;      
-  return true;
-});
-
-
+  const menuItemsToShow = MENU_ITEMS.filter(item => {
+    if (!user && item.route === "/dashboard") return false;
+    if (user && item.route === "/login") return false;
+    return true;
+  });
 
   const toggleSidebar = () => {
     const newVal = expanded ? SIDEBAR_COLLAPSED : SIDEBAR_EXPANDED;
@@ -56,6 +60,25 @@ const menuItemsToShow = MENU_ITEMS.filter(item => {
     }).start();
   }, [expanded]);
 
+  
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      if (!expanded || !user) return;
+      try {
+        setHistoryLoading(true);
+        const rows = await fetchHistory({ limit: 50 });
+        if (!cancelled) setHistory(rows);
+      } catch {
+      
+      } finally {
+        if (!cancelled) setHistoryLoading(false);
+      }
+    };
+    load();
+    return () => { cancelled = true; };
+  }, [expanded, user]);
+
   const webPointer: ViewStyle = Platform.OS === 'web' ? { cursor: 'pointer' as const } : {};
 
   const getLogoBarStyle = (expanded: boolean): ViewStyle => ({
@@ -69,6 +92,26 @@ const menuItemsToShow = MENU_ITEMS.filter(item => {
     marginBottom: 16,
   });
 
+  const goToHistoryItem = (it: HistoryItem) => {
+    const k = (it.kind || "").toLowerCase();
+    const href =
+      k === "video"   ? `/video/${it.media_id}`   :
+      k === "podcast" ? `/podcast/${it.media_id}` :  
+                        `/text/${it.media_id}`;
+    router.push(href as any);
+  };
+  
+
+  const removeHistory = async (mediaId: string) => {
+    try {
+      await deleteHistory(mediaId); 
+      setHistory(prev => prev.filter(h => h.media_id !== mediaId));
+      if (selectedHistoryMediaId === mediaId) setSelectedHistoryMediaId(null);
+    } catch {
+     
+    }
+  };
+
   return (
     <View style={{
       flex: 1,
@@ -78,12 +121,9 @@ const menuItemsToShow = MENU_ITEMS.filter(item => {
     }}>
       {/* HEADER */}
       <View style={{ width: '100%', position: 'absolute', left: 0, top: 0, zIndex: 1200 }}>
-        <CustomHeader
-          toggleSidebar={toggleSidebar}
-          isSidebarOpen={expanded}
-          
-        />
+        <CustomHeader toggleSidebar={toggleSidebar} isSidebarOpen={expanded} />
       </View>
+
       {/* SIDEBAR */}
       <Animated.View
         style={[
@@ -128,17 +168,13 @@ const menuItemsToShow = MENU_ITEMS.filter(item => {
             <TouchableOpacity
               onPress={toggleSidebar}
               activeOpacity={0.85}
-              style={{
-                width: 32,
-                height: 32,
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
+              style={{ width: 32, height: 32, alignItems: 'center', justifyContent: 'center' }}
             >
               <Feather name="sidebar" size={24} color={menu.sidebarToggleIcon} />
             </TouchableOpacity>
           )}
         </View>
+
         {/* MENU ITEMS */}
         <MenuItems
           expanded={expanded}
@@ -147,41 +183,77 @@ const menuItemsToShow = MENU_ITEMS.filter(item => {
           onMenuPress={(idx) => {
             setSelectedMenu(idx);
             router.push(menuItemsToShow[idx].route as any);
-
-
-
-          } }
+          }}
           selectedMenu={selectedMenu}
-          webPointer={webPointer} 
-         items={menuItemsToShow}       />
+          webPointer={webPointer}
+          items={menuItemsToShow}
+        />
+
         {expanded && <View style={[styles.divider, { backgroundColor: menu.dividerMenu }]} />}
-        {/* PAINTER HISTORY */}
-        {expanded && (
+
+        {/* HISTORY */}
+        {expanded && user && (
           <>
-            <Text style={[styles.sectionTitle, { color: menu.sectionTitle }]}>Painter History</Text>
+            <Text style={[styles.sectionTitle, { color: menu.sectionTitle }]}>History</Text>
             <ScrollView style={styles.historyContainer} contentContainerStyle={{ paddingBottom: 30 }}>
-              {HISTORY_ITEMS.map((item, idx) => (
-                <TouchableOpacity
-                  key={item.id}
-                  style={[
-                    styles.historyItem,
-                    { backgroundColor: selectedHistory === idx ? menu.historyActiveBg : menu.historyBg },
-                    webPointer
-                  ]}
-                  onPress={() => setSelectedHistory(idx)}
-                  activeOpacity={0.8}
-                >
-                  <FontAwesome5 name="paint-brush" size={18} color={menu.menuIcon} style={{ marginRight: 9 }} />
-                  <View>
-                    <Text style={[styles.historyTitle, { color: menu.historyTitle }]}>{item.title}</Text>
-                    <Text style={[styles.historyDate, { color: menu.historyDate }]}>{item.date}</Text>
+              {historyLoading && (
+                <Text style={{ color: menu.historyDate, paddingHorizontal: 12, paddingVertical: 6 }}>
+                  Loading…
+                </Text>
+              )}
+
+              {!historyLoading && history.length === 0 && (
+                <Text style={{ color: menu.historyDate, paddingHorizontal: 12, paddingVertical: 6 }}>
+                  No items yet
+                </Text>
+              )}
+
+              {!historyLoading && history.map((item) => {
+                const isSelected = selectedHistoryMediaId === item.media_id;
+                const dateLabel = new Date(item.updated_at).toLocaleDateString();
+                const iconName =
+                  item.kind === 'video'   ? 'play-circle' :
+                  item.kind === 'podcast' ? 'headphones'  : 'file-alt';
+
+                return (
+                  <View
+                    key={item.media_id}
+                    style={[
+                      styles.historyItem,
+                      { backgroundColor: isSelected ? menu.historyActiveBg : menu.historyBg }
+                    ]}
+                  >
+                    <TouchableOpacity
+                      style={[{ flexDirection: 'row', alignItems: 'center', flex: 1 }, webPointer]}
+                      activeOpacity={0.8}
+                      onPress={() => { setSelectedHistoryMediaId(item.media_id); goToHistoryItem(item); }}
+                    >
+                      <FontAwesome5 name={iconName as any} size={18} color={menu.menuIcon} style={{ marginRight: 9 }} />
+                      <View style={{ flex: 1, minWidth: 0 }}>
+                        <Text numberOfLines={1} style={[styles.historyTitle, { color: menu.historyTitle }]}>
+                          {item.media_title}
+                        </Text>
+                        <Text style={[styles.historyDate, { color: menu.historyDate }]}>
+                          {dateLabel}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      onPress={() => removeHistory(item.media_id)}
+                      style={{ paddingHorizontal: 8, paddingVertical: 6 }}
+                      hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                    >
+                      <Feather name="trash-2" size={16} color={menu.historyDate} />
+                    </TouchableOpacity>
                   </View>
-                </TouchableOpacity>
-              ))}
+                );
+              })}
             </ScrollView>
           </>
         )}
       </Animated.View>
+
       {/* CONTENT */}
       <Animated.View style={{ flex: 1, marginLeft: marginLeftAnim, marginTop: HEADER_HEIGHT }}>
         {children}

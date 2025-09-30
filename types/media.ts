@@ -1,9 +1,7 @@
-export interface TranscriptLine {
-  time: number;
-  text: string;
-}
+export type TranscriptLine = { time: number; text: string };
 
-export type Transcript = string | TranscriptLine[] | null | undefined;
+export type TranscriptObject = { html: string; cues?: TranscriptLine[] };
+export type Transcript = string | TranscriptLine[] | TranscriptObject;
 
 export interface Media {
   media_id: string;
@@ -11,5 +9,5 @@ export interface Media {
   media_description?: string | null;
   course_id: string;
   media_url: string;
-  media_transcript?: Transcript;
+  media_transcript?: Transcript | null;
 }
