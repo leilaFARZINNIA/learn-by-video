@@ -18,8 +18,7 @@ export default function Hero({ logoSize, fontSize, subtitle = "Sign in to contin
     <View style={s.hero}>
       <SvgComponent width={logoSize} height={logoSize} />
       <View style={s.textBlock}>
-        <Text style={[s.titleText, { fontSize }]}>LEARN</Text>
-        <Text style={[s.titleText, { fontSize }]}>BY VIDEO</Text>
+        <Text style={[s.titleText, { fontSize }]}>LINGOMODES</Text>
         <Text style={[s.subtitle, { color: login.textMuted }]}>{subtitle}</Text>
       </View>
     </View>

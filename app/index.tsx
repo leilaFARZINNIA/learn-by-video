@@ -52,8 +52,8 @@ export default function HomeScreen() {
         <View style={[styles.rowContainer, { gap }]}>
           <SvgComponent width={logoSize} height={logoSize} />
           <View style={styles.textBlock}>
-            <Text style={[styles.titleText, { fontSize }]}>LEARN</Text>
-            <Text style={[styles.titleText, { fontSize }]}>BY VIDEO</Text>
+            <Text style={[styles.titleText, { fontSize }]}>LINGOMODES</Text>
+           
           </View>
         </View>
       </View>
