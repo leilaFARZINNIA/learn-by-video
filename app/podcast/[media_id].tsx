@@ -1,36 +1,32 @@
 // app/podcast/[media_id].tsx
 import { upsertHistory } from "@/api/history";
 import { fetchMediaById } from "@/api/media-api";
+import Controls from "@/components/podcast/Controls";
+import PodcastAvatar from "@/components/podcast/PodcastAvatar";
+import TimeSlider from "@/components/podcast/TimeSlider";
+import TranscriptList from "@/components/podcast/TranscriptList";
+import { HIGHLIGHT_WORDS } from "@/constants/media/transcript-highlight";
 import { useTheme } from "@/context/ThemeContext";
+import { useResponsiveContainerStyle } from "@/theme/podcast/responsive";
+import { AutoItem, autoTimeTranscript } from "@/utils/autoTimecode";
 import { useAutoStopMedia } from "@/utils/mediaLifecycle";
 import { Audio, AVPlaybackStatus, InterruptionModeAndroid, InterruptionModeIOS } from "expo-av";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
 
-import Controls from "@/components/podcast/Controls";
-import PodcastAvatar from "@/components/podcast/PodcastAvatar";
-import TimeSlider from "@/components/podcast/TimeSlider";
-import TranscriptList from "@/components/podcast/TranscriptList";
-import { useResponsiveContainerStyle } from "@/theme/podcast/responsive";
-
-
-import { HIGHLIGHT_WORDS } from "@/constants/media/transcript-highlight";
-import { AutoItem, autoTimeTranscript } from "@/utils/autoTimecode";
 
 export default function PodcastScreen() {
   const { colors } = useTheme();
   const podcast = (colors as any).podcast;
   const containerStyle = useResponsiveContainerStyle({});
   const { media_id } = useLocalSearchParams<{ media_id?: string }>();
-
   const soundRef = useRef<Audio.Sound | null>(null);
   useAutoStopMedia({ soundRef, mode: "unload" });
 
   const [media, setMedia] = useState<any>(null);
   const [loadingMedia, setLoadingMedia] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   const [isLoaded, setIsLoaded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isBuffering, setIsBuffering] = useState(false);
@@ -41,6 +37,8 @@ export default function PodcastScreen() {
 
   const postedOnceRef = useRef(false);
   const lastPostMsRef = useRef(0);
+  const [html, setHtml] = useState<string>("");
+
 
   // ---------- fetch media ----------
   useEffect(() => {
@@ -101,6 +99,8 @@ export default function PodcastScreen() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [media?.media_url]);
+
+  
 
   // ---------- playback status ----------
   const onStatus = (st: AVPlaybackStatus) => {

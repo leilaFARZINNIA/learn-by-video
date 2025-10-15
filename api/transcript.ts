@@ -21,6 +21,9 @@ export async function alignTranscript(mediaId: string, duration_sec: number) {
 }
 
 export async function fetchTranscript(mediaId: string) {
-  const { data } = await api.get<TranscriptOut>(`/medias/${mediaId}/transcript`);
+  const { data } = await api.get<TranscriptOut>(`/medias/${mediaId}/transcript`, {
+    params: { _ts: Date.now() },   
+    headers: { "Cache-Control": "no-store" },
+  });
   return data;
 }
